@@ -1,10 +1,7 @@
-from bs4 import BeautifulSoup
+from .parsedpage import ParsedPage, BeautifulSoup
 
 
-class LoginPage:
-    def __init__(self, html: str):
-        self.dom = BeautifulSoup(html)
-
+class LoginPage(ParsedPage):
     def assembleFormData(self, usr: str, pw: str):
         # form data:
         fdata = {}
@@ -19,3 +16,11 @@ class LoginPage:
         fdata['password'] = pw
 
         return fdata
+
+    def url(self):
+        return self.dom.find("form", attrs={'name': 'login'}).attrs.get('action')
+
+    def getRedirectUrlFromResponse(self, resp: str):
+        dom = BeautifulSoup(resp,  "html.parser")
+        return dom.find('p', attrs={'class': 'info message'}).find(
+            'a').attrs.get('href')
