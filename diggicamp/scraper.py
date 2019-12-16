@@ -1,14 +1,15 @@
 import requests
+import urllib
+
 from .exceptions import WebException
-from .pages import login, courses
+from .pages import login, courses, course_files
 from .config import DiggicampConf
 
 
 class Diggicamp:
-    baseurl = "https://digicampus.uni-augsburg.de/"
-
-    def __init__(self):
+    def __init__(self, conf: DiggicampConf):
         self.session = requests.Session()
+        self.conf = conf
 
     def login(self, user: str, pw: str):
         html = self._get('/?sso=webauth&cancel_login=1&again=yes')
@@ -24,15 +25,24 @@ class Diggicamp:
         self._get(redirect, base='')
 
     def get_courses(self):
-        html = self._get('/dispatch.php/my_courses')
+        page = courses.CoursesPage(self._get('/dispatch.php/my_courses'))
 
-        page = courses.CoursesPage(html)
+        courses_ = page.getCourses()
 
-        return page.getCourses()
+        self.conf.set('courses', courses_)
+
+        return courses_
+
+    def get_files(self, course_id: str):
+        files = course_files.CourseFiles(self, course_id).getFileTree()
+
+        self.conf.set('files.' + course_id, files)
+
+        return files
 
     def _get(self, url: str, base=None):
         if base == None:
-            base = self.baseurl
+            base = self.conf.get('baseurl')
         resp = self.session.get(base + url)
 
         if resp.ok:
@@ -43,7 +53,7 @@ class Diggicamp:
 
     def _post(self, url: str, data, base=None):
         if base == None:
-            base = self.baseurl
+            base = self.conf.get('baseurl')
         resp = self.session.post(base + url, data=data)
 
         if resp.ok:
@@ -55,7 +65,7 @@ class Diggicamp:
 
     def _download(self, url: str, target: str, base=None):
         if base == None:
-            base = self.baseurl
+            base = self.conf.get('baseurl')
         resp = self.session.get(base + url)
 
         if resp.ok:
@@ -64,3 +74,8 @@ class Diggicamp:
                 f.write(resp.content)
         else:
             raise WebException("GET " + base + url + " failed!", resp)
+
+    def _download_file(self, target_dir: str, file: dict):
+        id = file['id']
+        name = urllib.parse.quote(file['fname'])
+        return self._download(f'/sendfile.php?type=0&file_id={id}&file_name={name}', target_dir + '/' + file['fname'])

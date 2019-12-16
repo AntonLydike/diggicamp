@@ -5,7 +5,7 @@ class DiggicampConf:
     def __init__(self, settings: object):
         self.opts = settings
 
-    def get(self, key: str):
+    def get(self, key: str) -> str:
         obj = self.opts
         for path in key.split("."):
             if path in obj:
@@ -23,11 +23,20 @@ class DiggicampConf:
             obj = obj[path]
         obj[lastKey] = val
 
+    def save(self, file: str):
+        with open(file, "w") as f:
+            f.write(json.dumps(self.opts, indent=2))
+
     @staticmethod
-    def fromFile(fname: str):
+    def fromFile(fname: str) -> 'DiggicampConf':
         with open(fname, "r") as f:
             return DiggicampConf(json.load(f))
 
     @staticmethod
-    def fromString(string: str):
+    def fromString(string: str) -> DiggicampConf:
         return DiggicampConf(json.loads(string))
+
+    @staticmethod
+    def default() -> DiggicampConf:
+        conf = DiggicampConf({})
+        conf.set('baseurl', 'https://digicampus.uni-augsburg.de/')

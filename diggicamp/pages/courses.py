@@ -1,4 +1,13 @@
-from .parsedpage import ParsedPage
+import re
+from .parsedpage import ParsedPage, unicode
+
+
+def idFromUrl(url: str):
+    match = re.search(r'auswahl=([^&]+)', url)
+    if match:
+        return match.group(1)
+    else:
+        return None
 
 
 class CoursesPage(ParsedPage):
@@ -12,15 +21,15 @@ class CoursesPage(ParsedPage):
             # remove the thead section, as it contains no valuable information
             semester.find('thead').extract()
             sem = {
-                'title': semester.find('caption').string.strip(),
+                'title': unicode(semester.find('caption').string.strip()),
                 'courses': []
             }
 
             for course in semester.find_all('tr'):
                 link = course.find('a')
                 sem['courses'].append({
-                    'name': link.string.strip(),
-                    'url': link['href']
+                    'name': unicode(link.string.strip()),
+                    'id': idFromUrl(link['href'])
                 })
 
             semesters[sem['title']] = sem
