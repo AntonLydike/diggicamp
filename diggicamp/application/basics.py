@@ -2,7 +2,7 @@ from ..scraper import Diggicamp
 from ..config import DiggicampConf
 
 
-def open(path: str = 'dgc.json'):
+def d_open(path: str = 'dgc.json'):
     conf = DiggicampConf.fromFile(path)
     return Diggicamp(conf)
 
@@ -19,6 +19,13 @@ def save(dgc: Diggicamp, path: str = 'dgc.json'):
 
 def fetch(dgc: Diggicamp):
     dgc.get_courses(cached=False)
+
+    if not dgc.conf.get('files'):
+        return
+    # refresha all downloaded courses
+    for course in dgc.conf.get('files'):
+
+        dgc.get_files(course, cached=False)
 
 
 def pull(dgc: Diggicamp):
@@ -40,4 +47,4 @@ def add_download(dgc: Diggicamp, folder_id: str, target: str, pattern=None):
     else:
         entry = target
 
-    dgc.conf.put('downloads.' + folder_id, entry)
+    dgc.conf.set('downloads.' + folder_id, entry)

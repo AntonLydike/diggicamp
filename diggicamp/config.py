@@ -37,6 +37,16 @@ class DiggicampConf:
                 return False
         return True
 
+    def add_auth(self, mode, **args):
+        if mode == 'plain':
+            self.set('credentials', {
+                'mode': 'plain',
+                'username': args['username'],
+                'password': args['password']
+            })
+        else:
+            raise Exception("Unknown auth method!")
+
     @staticmethod
     def fromFile(fname: str) -> 'DiggicampConf':
         with open(fname, "r") as f:

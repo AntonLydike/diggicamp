@@ -1,7 +1,4 @@
 BeautifulSoup4
 lxml
 requests
-re
-urllib
-json
-threading
+clint

@@ -1,15 +1,23 @@
 from ..scraper import Diggicamp
 
 
-def course_by_name(dgc: Diggicamp, course_name: str, semester_title=None, semester=None):
+def semester_by_name(dgc: Diggicamp, semester_name):
+    for semester in dgc.conf.get('courses'):
+        if semester['title'] == semester_name:
+            return semester
+    return None
+
+
+def course_by_name(dgc: Diggicamp, course_name: str, semester_title=None, semester: dict = None):
     """
     find a course by it's name
         course_name: the name of the course (exact)
         semester_title (opt): the title of the semester which contains the specified xourse
-        semester (opt): the semester object which contains the specified xourse
+        semester (opt): the semester object which contains the specified course
 
         if neither a semester_title or semester are specified, the newest semester is used
     """
+    # ensure courses are loaded
     dgc.get_courses()
 
     if not semester:
@@ -45,3 +53,10 @@ def folder_by_name(dgc: Diggicamp, folder_name: str, course):
             return folder
 
     return None
+
+
+def course_by_id(dgc: Diggicamp, course_id: str):
+    for semester in dgc.conf.get('courses'):
+        for course in semester['courses']:
+            if course['id'] == course_id:
+                return course

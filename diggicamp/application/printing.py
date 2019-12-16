@@ -2,11 +2,14 @@ from ..scraper import Diggicamp
 from ..config import DiggicampConf
 
 
-def print_courses(dgc: Diggicamp, all: bool = False):
+def print_courses(dgc: Diggicamp, all: bool = False, course=None):
     courses = dgc.get_courses()
 
     if not all:
         courses = courses[:1]
+
+    if course:
+        courses = [course]
 
     for semester in courses:
         print("{title}: ".format(**semester))
