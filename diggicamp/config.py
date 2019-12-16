@@ -12,6 +12,7 @@ class DiggicampConf:
                 obj = obj[path]
             else:
                 return None
+        return obj
 
     def set(self, key: str, val: any):
         keys = key.split(".")
@@ -27,16 +28,26 @@ class DiggicampConf:
         with open(file, "w") as f:
             f.write(json.dumps(self.opts, indent=2))
 
+    def has(self, key: str):
+        obj = self.opts
+        for path in key.split("."):
+            if path in obj:
+                obj = obj[path]
+            else:
+                return False
+        return True
+
     @staticmethod
     def fromFile(fname: str) -> 'DiggicampConf':
         with open(fname, "r") as f:
             return DiggicampConf(json.load(f))
 
     @staticmethod
-    def fromString(string: str) -> DiggicampConf:
+    def fromString(string: str) -> 'DiggicampConf':
         return DiggicampConf(json.loads(string))
 
     @staticmethod
-    def default() -> DiggicampConf:
+    def default() -> 'DiggicampConf':
         conf = DiggicampConf({})
         conf.set('baseurl', 'https://digicampus.uni-augsburg.de/')
+        return conf

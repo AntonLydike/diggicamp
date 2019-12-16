@@ -13,7 +13,7 @@ def idFromUrl(url: str):
 class CoursesPage(ParsedPage):
     def getCourses(self):
         # output dictionary
-        semesters = {}
+        semesters = []
         # find the container of the seminar pages
         cont = self.dom.find('div', id='my_seminars')
 
@@ -32,6 +32,6 @@ class CoursesPage(ParsedPage):
                     'id': idFromUrl(link['href'])
                 })
 
-            semesters[sem['title']] = sem
+            semesters.append(sem)
 
         return semesters
