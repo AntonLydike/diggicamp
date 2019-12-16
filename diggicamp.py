@@ -32,6 +32,7 @@ for flag in args.flags.all:
 if 'v' in flags:
     puts(colored.blue('Grouped Arguments: ') + str(dict(args.grouped)))
     puts(colored.blue('Flags: ') + str(flags))
+    print()
 
 arg0 = args.grouped.get('_')[0]
 
@@ -81,8 +82,12 @@ elif arg0 == 'fetch':
     print("fetching new data from server...")
     diggicamp.fetch(dgc)
 elif arg0 == 'pull':
+    if 'f' in flags or get_bool_arg('--fetch'):
+        print("fetching new data from server...")
+        diggicamp.fetch(dgc)
+
     print("downloading defined folders from server...")
-    dgc.download_cached_folders()
+    diggicamp.pull(dgc)
 elif arg0 == 'add':
     course_name = args.grouped.get('_')[1]
     folder_name = args.grouped.get('_')[2]
@@ -133,10 +138,8 @@ commands:
                              current semester is assumed. If a regex is 
                              specified, only files matching it will be 
                              downloaded
-    pull                     download all files from the folders on the 
+    pull [-f|--fetch]        download all files from the folders on the 
                              sync-list to their destinations
 """)
 
 diggicamp.save(dgc, cfg_file)
-
-print()

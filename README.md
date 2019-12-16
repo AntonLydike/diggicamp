@@ -94,7 +94,7 @@ print_curses(dgc, course)
 
 * [ ] multithreaded downloads
 * [ ] multithreaded sync
-* [ ] pull with fetch in one command
+* [X] pull with fetch in one command
 * [ ] cli autocomplete
 * [ ] multiple auth options (pass, prompt, etc)
 * [ ] store session between calls
