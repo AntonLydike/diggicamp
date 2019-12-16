@@ -88,3 +88,13 @@ print_courses(dgc, all=True)
 # print folders in a course
 print_curses(dgc, course)
 ```
+
+
+# TO-DO:
+
+* [ ] multithreaded downloads
+* [ ] multithreaded sync
+* [ ] pull with fetch in one command
+* [ ] cli autocomplete
+* [ ] multiple auth options (pass, prompt, etc)
+* [ ] store session between calls
