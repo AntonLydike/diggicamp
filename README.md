@@ -62,7 +62,7 @@ from diggicamp import *
 dgc = d_open('path-to-your-dgc.json') #defaults to 'dgc.json'
 
 # fetch from server
-fetch(dgc)
+fetch(dgc, threads=16)
 
 # create new dgc instance and save the dgc.json file
 dgc = new('path-to-your-dgc.json') #defaults to 'dgc.json'
@@ -73,7 +73,7 @@ dgc.conf.add_auth('plain', username="", password="")
 add_download(dgc, folder_id, target_path) # optional pattern arg
 
 # download all configured folders
-pull(dgc)
+pull(dgc, threads=32)
 
 ## Helpers:
 
