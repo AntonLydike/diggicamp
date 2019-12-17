@@ -23,6 +23,7 @@ class Diggicamp:
 
     def login(self):
         print("logging in...")
+        print("authed: {}".format(self.authed))
         html = self._get('/?sso=webauth&cancel_login=1&again=yes', unauthed=True)
 
         if not self.conf.has('credentials'):
@@ -121,7 +122,8 @@ class Diggicamp:
 
         if resp.ok:
             if not unauthed and self.authed and is_not_logged_in(resp):
-                self.authed = False
+                print("lost auth in: {} with unauthed={}".format(url, unauthed))
+                self._deauth()
                 return self._get(url, base)
 
             if self.verbose:
@@ -142,7 +144,8 @@ class Diggicamp:
 
         if resp.ok:
             if not unauthed and self.authed and is_not_logged_in(resp):
-                self.authed = False
+                self._deauth()
+                print("lost auth...")
                 return self._post(url, data, base)
 
             if self.verbose:
@@ -164,7 +167,7 @@ class Diggicamp:
 
         if resp.ok:
             if self.authed and is_not_logged_in(resp):
-                self.authed = False
+                self._deauth()
                 return self._download(url, target, base)
 
             if self.verbose:
@@ -186,6 +189,13 @@ class Diggicamp:
 
     def _save_cookies(self):
         self.conf.set('cookies', self.session.cookies.get_dict())
+
+    def _deauth(self):
+        """
+        remove old cookies, set authed to false, etc
+        """
+        self.session.cookies.clear()
+        self.authed = False
 
 
 def is_not_logged_in(resp: requests.Response) -> bool:
