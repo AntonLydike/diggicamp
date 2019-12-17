@@ -54,7 +54,7 @@ commands:
 
 You can also just import the `diggicamp` package in python3 and use it that way. Although documentation is scarce.
 
-```python3
+```python
 from diggicamp import *
 
 ## Basics

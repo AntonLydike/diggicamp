@@ -2,6 +2,7 @@ from bs4 import NavigableString
 from .parsedpage import ParsedPage, unicode
 import threading
 import re
+import requests
 
 
 class CourseFiles:
@@ -86,7 +87,7 @@ def process_folder_async(diggicamp, course: str, folder: dict):
         if not fname:
             raise Exception('link url has invalid format')
 
-        fname = fname.group(1)
+        fname = requests.utils.unquote(fname.group(1), encoding="1250")
 
         folder['files'].append({
             'id': id,
