@@ -65,7 +65,6 @@ def process_folder_async(diggicamp, course: str, folder: dict):
     # subfolders are contained inside this div: <div class="folder_container" id="folder_subfolders_ae1fd77a82bd4d1e74350e88ada5e58a"></div>
 
     if not fcontainer:
-        print("empty container")
         return
 
     for file in list(fcontainer.children):

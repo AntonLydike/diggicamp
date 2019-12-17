@@ -101,8 +101,8 @@ print_curses(dgc, course)
 
 # TO-DO:
 
-* [ ] multithreaded downloads
-* [ ] multithreaded sync
+* [X] multithreaded downloads
+* [X] multithreaded sync
 * [X] pull with fetch in one command
 * [ ] cli autocomplete
 * [ ] multiple auth options (pass, prompt, etc)
