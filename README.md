@@ -11,21 +11,28 @@ This... thing... exposes a couple of ways to interact with it:
 to use the cli, link the `diggicamp.py` script anywhere to your path (alias is `dgc` or something like that) and then use it like this:
 
 ```
-Usage: dgc [<flags>] <command> [<args>]
+Usage: dgc [<flags>] <command> [<args>] [--cfg <path>]
 
 Download files for courses from digicampus.
 
 flags:
 
      -v                      verbose mode - more output
+
+
+other args:
+
      --cfg <path>            specify a config file path (default is dgc.json)
+
 
 commands:
 
     init [<url>] --user <username> --pass <password>
-                             Initialize a new config file
+                             initialize a new config file
+    fetch [--threads <threadcount>]
+                             refresh semester, courses, folders and files. Use
+                             <threadcount> threads for this (default 16)
     show [--all]             show courses for the current (or all) semesters
-    fetch                    refresh semester, courses, folders and files
     show <semester>          show courses in a specific semester
     show <course>            show files in a specific course from the current 
                              semester
@@ -37,8 +44,10 @@ commands:
                              current semester is assumed. If a regex is 
                              specified, only files matching it will be 
                              downloaded
-    pull                     download all files from the folders on the 
-                             sync-list to their destinations
+    pull [-f|--fetch] [--threads <threadcount>]
+                             download all files from the folders on the 
+                             sync-list to their destinations. If not specified, 
+                             16 concurrent downloads are started
 ```
 
 ### Python package
