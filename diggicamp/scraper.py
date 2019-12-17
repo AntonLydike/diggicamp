@@ -11,9 +11,14 @@ class Diggicamp:
     authed = False
     verbose = False
 
-    def __init__(self, conf: DiggicampConf):
+    def __init__(self, conf: DiggicampConf, verbose: bool = False):
         self.session = requests.Session()
         self.conf = conf
+        self.verbose = verbose
+
+        if conf.has('cookies'):
+            self.authed = True
+            requests.utils.add_dict_to_cookiejar(self.session.cookies, conf.get('cookies'))
 
     def login(self):
         print("logging in...")
@@ -39,6 +44,7 @@ class Diggicamp:
         self._get(redirect, base='', unauthed=True)
 
         self.authed = True
+        self._save_cookies()
 
     def get_courses(self, cached: bool = True):
         if cached and self.conf.has('courses'):
@@ -166,6 +172,9 @@ class Diggicamp:
         id = file['id']
         name = urllib.parse.quote(file['fname'])
         return self._download(f'/sendfile.php?type=0&file_id={id}&file_name={name}', target_dir + '/' + file['fname'])
+
+    def _save_cookies(self):
+        self.conf.set('cookies', self.session.cookies.get_dict())
 
 
 def is_not_logged_in(resp: requests.Response) -> bool:

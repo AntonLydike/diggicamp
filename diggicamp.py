@@ -124,9 +124,9 @@ flags:
 commands:
 
     init [<url>] --user <username> --pass <password>
-                             Initialize a new config file
-    show [--all]             show courses for the current (or all) semesters
+                             initialize a new config file
     fetch                    refresh semester, courses, folders and files
+    show [--all]             show courses for the current (or all) semesters
     show <semester>          show courses in a specific semester
     show <course>            show files in a specific course from the current 
                              semester

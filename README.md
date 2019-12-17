@@ -97,4 +97,4 @@ print_curses(dgc, course)
 * [X] pull with fetch in one command
 * [ ] cli autocomplete
 * [ ] multiple auth options (pass, prompt, etc)
-* [ ] store session between calls
+* [X] store session between calls
