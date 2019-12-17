@@ -1,6 +1,7 @@
 import requests
 import urllib
 import os
+from concurrent.futures import ThreadPoolExecutor
 
 from .exceptions import WebException, NotLoggedInScepion
 from .pages import login, courses, course_files
@@ -80,12 +81,17 @@ class Diggicamp:
 
         return None
 
-    def download_cached_folders(self):
+    def download_cached_folders(self, threads: int = 16):
         if not self.conf.get('downloads'):
             print("No downloads configured")
             return
 
         downloads = self.conf.get('downloads')
+
+        if threads < 1:
+            raise Exception("downloading cannot happen with fewer than 1 threads!")
+
+        exec = ThreadPoolExecutor(max_workers=threads)
 
         for fid in downloads:
             directive = downloads[fid]
@@ -100,7 +106,9 @@ class Diggicamp:
                 os.makedirs(target)
 
             for file in folder['files']:
-                self._download_file(target, file)
+                exec.submit(self._download_file, target, file)
+
+        exec.shutdown()
 
     def _get(self, url: str, base=None, unauthed: bool = False):
         if not unauthed and not self.authed:
@@ -168,10 +176,13 @@ class Diggicamp:
             raise WebException("GET " + base + url + " failed!", resp)
 
     def _download_file(self, target_dir: str, file: dict):
-        print("{:<60} → {}".format(file['fname'], target_dir))
         id = file['id']
         name = urllib.parse.quote(file['fname'])
-        return self._download(f'/sendfile.php?type=0&file_id={id}&file_name={name}', target_dir + '/' + file['fname'])
+
+        ret = self._download(f'/sendfile.php?type=0&file_id={id}&file_name={name}', target_dir + '/' + file['fname'])
+
+        print("{:<60} → {}".format(file['fname'], target_dir))
+        return ret
 
     def _save_cookies(self):
         self.conf.set('cookies', self.session.cookies.get_dict())

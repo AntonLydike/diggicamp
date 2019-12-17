@@ -98,3 +98,4 @@ print_curses(dgc, course)
 * [ ] cli autocomplete
 * [ ] multiple auth options (pass, prompt, etc)
 * [X] store session between calls
+* [ ] compare regex before downloading

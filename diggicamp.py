@@ -80,14 +80,14 @@ elif arg0 == 'show':
         diggicamp.print_folders(dgc, course)
 elif arg0 == 'fetch':
     print("fetching new data from server...")
-    diggicamp.fetch(dgc)
+    diggicamp.fetch(dgc, threads=int(get_arg('--threads', 16)))
 elif arg0 == 'pull':
     if 'f' in flags or get_bool_arg('--fetch'):
         print("fetching new data from server...")
-        diggicamp.fetch(dgc)
+        diggicamp.fetch(dgc, threads=int(get_arg('--threads', 16)))
 
     print("downloading defined folders from server...")
-    diggicamp.pull(dgc)
+    diggicamp.pull(dgc, threads=int(get_arg('--threads', 16)))
 elif arg0 == 'add':
     course_name = args.grouped.get('_')[1]
     folder_name = args.grouped.get('_')[2]
@@ -112,20 +112,27 @@ elif arg0 == 'add':
 
     diggicamp.add_download(dgc, folder['id'], target, regex)
 else:
-    print("""Usage: dgc [<flags>] <command> [<args>]
+    print("""Usage: dgc [<flags>] <command> [<args>] [--cfg <path>]
 
 Download files for courses from digicampus.
 
 flags:
 
      -v                      verbose mode - more output
+
+
+other args:
+
      --cfg <path>            specify a config file path (default is dgc.json)
+
 
 commands:
 
     init [<url>] --user <username> --pass <password>
                              initialize a new config file
-    fetch                    refresh semester, courses, folders and files
+    fetch [--threads <threadcount>]
+                             refresh semester, courses, folders and files. Use
+                             <threadcount> threads for this (default 16)
     show [--all]             show courses for the current (or all) semesters
     show <semester>          show courses in a specific semester
     show <course>            show files in a specific course from the current 
@@ -138,8 +145,10 @@ commands:
                              current semester is assumed. If a regex is 
                              specified, only files matching it will be 
                              downloaded
-    pull [-f|--fetch]        download all files from the folders on the 
-                             sync-list to their destinations
+    pull [-f|--fetch] [--threads <threadcount>]
+                             download all files from the folders on the 
+                             sync-list to their destinations. If not specified, 
+                             16 concurrent downloads are started
 """)
 
 diggicamp.save(dgc, cfg_file)

@@ -1,3 +1,5 @@
+from concurrent.futures import ThreadPoolExecutor
+
 from ..scraper import Diggicamp
 from ..config import DiggicampConf
 
@@ -17,19 +19,22 @@ def save(dgc: Diggicamp, path: str = 'dgc.json'):
     dgc.conf.save(path)
 
 
-def fetch(dgc: Diggicamp):
+def fetch(dgc: Diggicamp, threads: int = 16):
     dgc.get_courses(cached=False)
 
     if not dgc.conf.get('files'):
         return
+
+    exec = ThreadPoolExecutor(max_workers=threads)
     # refresha all downloaded courses
     for course in dgc.conf.get('files'):
+        exec.submit(dgc.get_files, course, cached=False)
 
-        dgc.get_files(course, cached=False)
+    exec.shutdown()
 
 
-def pull(dgc: Diggicamp):
-    dgc.download_cached_folders()
+def pull(dgc: Diggicamp, threads: int = 16):
+    dgc.download_cached_folders(threads=threads)
 
 
 def add_download(dgc: Diggicamp, folder_id: str, target: str, pattern=None):
