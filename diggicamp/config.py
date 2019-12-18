@@ -8,7 +8,7 @@ class DiggicampConf:
     def __init__(self, settings: object):
         self.opts = settings
 
-        if settings['version'] != CONFIG_VERSION:
+        if 'version' in settings != CONFIG_VERSION:
             print("different version detected")
 
     def get(self, key: str) -> str:
