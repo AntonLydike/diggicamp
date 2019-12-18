@@ -19,7 +19,7 @@ def save(dgc: Diggicamp, path: str = 'dgc.json'):
     dgc.conf.save(path)
 
 
-def fetch(dgc: Diggicamp, threads: int = 16):
+def fetch(dgc: Diggicamp, threads: int = 32):
     dgc.get_courses(cached=False)
 
     if not dgc.conf.get('files'):
@@ -33,7 +33,7 @@ def fetch(dgc: Diggicamp, threads: int = 16):
     exec.shutdown()
 
 
-def pull(dgc: Diggicamp, threads: int = 16):
+def pull(dgc: Diggicamp, threads: int = 32):
     dgc.download_cached_folders(threads=threads)
 
 

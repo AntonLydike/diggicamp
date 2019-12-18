@@ -99,8 +99,11 @@ class Diggicamp:
 
             folder = self.get_cached_folder(fid)
             if not folder:
-                print(
-                    f"Folder {fid} (targeting {target}) is not in the cache!\n\nRun\n    dgc show <course>\nwith the correct course to initially fetch the folder")
+                print(f"""Folder {fid} (targeting {target}) is not in the cache!
+
+Run
+    dgc show <course>
+with the correct course to initially fetch the folder""")
                 continue
 
             if not os.path.exists(target):
