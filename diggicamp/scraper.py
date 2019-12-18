@@ -76,13 +76,12 @@ class Diggicamp:
         folders = self.conf.get('files')
 
         for course in folders.values():
-            for folder in course.values():
-                if folder['id'] == fid:
-                    return folder
+            if fid in course:
+                return course[fid]
 
         return None
 
-    def download_cached_folders(self, threads: int = 16):
+    def download_cached_folders(self, threads: int = 32):
         if not self.conf.get('downloads'):
             print("No downloads configured")
             return
@@ -94,13 +93,14 @@ class Diggicamp:
 
         exec = ThreadPoolExecutor(max_workers=threads)
 
-        for fid in downloads:
-            directive = downloads[fid]
-            target = directive if isinstance(directive, str) else directive['target']
+        for rule in downloads:
+            target = rule['target']
+            fid = rule['folder']
 
             folder = self.get_cached_folder(fid)
             if not folder:
-                print(f"Folder {fid} (targeting {target}) is not in the cache!")
+                print(
+                    f"Folder {fid} (targeting {target}) is not in the cache!\n\nRun\n    dgc show <course>\nwith the correct course to initially fetch the folder")
                 continue
 
             if not os.path.exists(target):

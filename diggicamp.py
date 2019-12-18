@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import diggicamp
 from clint.arguments import Args
 from clint.textui import puts, colored, indent
@@ -34,24 +35,32 @@ if 'v' in flags:
     puts(colored.blue('Flags: ') + str(flags))
     print()
 
-arg0 = args.grouped.get('_')[0]
+ARG0 = args.grouped.get('_')[0]
 
-cfg_file = get_arg('--cfg', 'dgc.json')
+CFG_FILE = get_arg('--cfg', 'dgc.json')
 
-dgc = diggicamp.d_open(cfg_file)
+THREADS = int(get_arg('--threads', 32))
 
-dgc.verbose = 'v' in flags
-
-if arg0 == 'init':
-    dgc = diggicamp.new(cfg_file)
+if ARG0 == 'init':
+    dgc = diggicamp.new(CFG_FILE)
     usr = get_arg('--user')
     pw = get_arg('--pass')
     dgc.conf.add_auth('plain', username=usr, password=pw)
 
     if args.grouped.get('_')[1]:
         dgc.conf.set('baseurl', args.grouped.get('_')[1])
+    diggicamp.save(dgc, CFG_FILE)
+    exit(0)
 
-elif arg0 == 'show':
+
+if os.path.isfile(CFG_FILE):
+    dgc = diggicamp.d_open(CFG_FILE)
+    dgc.verbose = 'v' in flags
+else:
+    print("Diggicamp is not configured! Run\n\n    dgc init <url> --user <user> --pass <password>\n\nto initialize a new config")
+    exit(1)
+
+if ARG0 == 'show':
     if not args.grouped.get('_')[1]:
         # no arg supplied, list courses with optional all flag
         diggicamp.print_courses(dgc, all=get_bool_arg('--all'))
@@ -78,39 +87,63 @@ elif arg0 == 'show':
             exit(1)
 
         diggicamp.print_folders(dgc, course)
-elif arg0 == 'fetch':
+elif ARG0 == 'fetch':
     print("fetching new data from server...")
-    diggicamp.fetch(dgc, threads=int(get_arg('--threads', 16)))
-elif arg0 == 'pull':
+    diggicamp.fetch(dgc, threads=THREADS)
+elif ARG0 == 'pull':
     if 'f' in flags or get_bool_arg('--fetch'):
         print("fetching new data from server...")
-        diggicamp.fetch(dgc, threads=int(get_arg('--threads', 16)))
+        diggicamp.fetch(dgc, threads=THREADS)
 
     print("downloading defined folders from server...")
-    diggicamp.pull(dgc, threads=int(get_arg('--threads', 16)))
-elif arg0 == 'add':
-    course_name = args.grouped.get('_')[1]
-    folder_name = args.grouped.get('_')[2]
-    target = args.grouped.get('_')[3]
+    diggicamp.pull(dgc, threads=THREADS)
+elif ARG0 == 'downloads' or ARG0 == 'dl':
+    ARG1 = args.grouped.get('_')[1]
 
-    if not course_name or not folder_name or not target:
-        print("correct syntax is: add <course> <folder> <path> [--sem <semester>] [--regex <regex>]")
-        exit(1)
+    if not ARG1 or ARG1 == 'show':
+        diggicamp.print_download_definitions(dgc)
+    elif ARG1 == 'add':
+        course_name = args.grouped.get('_')[2]
+        folder_name = args.grouped.get('_')[3]
+        target = args.grouped.get('_')[4]
 
-    regex = get_arg('--regex', optional=True)
+        if not course_name or not folder_name or not target:
+            print("correct syntax is: add <course> <folder> <path> [--sem <semester>] [--regex <regex>]")
+            exit(1)
 
-    course = diggicamp.course_by_name(dgc, course_name, semester_title=get_arg('--sem', optional=True))
-    if not course:
-        print(f"No course found for \"{course_name}\"")
-        exit(1)
+        regex = get_arg('--regex', optional=True)
 
-    folder = diggicamp.folder_by_name(dgc, folder_name, course)
+        course = diggicamp.course_by_name(dgc, course_name, semester_title=get_arg('--sem', optional=True))
 
-    if not folder:
-        print(f"No folder named \"{folder_name}\" found!")
-        exit(1)
+        if not course:
+            print(f"No course found for \"{course_name}\"")
+            exit(1)
 
-    diggicamp.add_download(dgc, folder['id'], target, regex)
+        folder = diggicamp.folder_by_name(dgc, folder_name, course)
+
+        if not folder:
+            print(f"No folder named \"{folder_name}\" found!")
+            exit(1)
+
+        diggicamp.add_download(dgc, folder['id'], target, regex)
+
+        puts(colored.blue("Added download rule:\n", bold=True))
+        diggicamp.print_download_definitions(dgc)
+    elif ARG1 == 'remove':
+        index = int(args.grouped.get('_')[2])
+        dls: list = dgc.conf.get('downloads')
+        if not dls or index > len(dls) - 1:
+            puts(colored.red("No download rule #{} found!\n".format(index), bold=True))
+            puts("Available rules are:\n")
+            diggicamp.print_download_definitions(dgc)
+            print()
+            exit(1)
+        dls.remove(dls[index])
+        dgc.conf.set('downloads', dls)
+
+        puts(colored.blue("Successfully deleted rule #{}!\n".format(index), bold=True))
+        diggicamp.print_download_definitions(dgc)
+
 else:
     print("""Usage: dgc [<flags>] <command> [<args>] [--cfg <path>]
 
@@ -132,23 +165,28 @@ commands:
                              initialize a new config file
     fetch [--threads <threadcount>]
                              refresh semester, courses, folders and files. Use
-                             <threadcount> threads for this (default 16)
+                             <threadcount> threads for this (default 32)
     show [--all]             show courses for the current (or all) semesters
     show <semester>          show courses in a specific semester
-    show <course>            show files in a specific course from the current 
+    show <course>            show files in a specific course from the current
                              semester
     show <semester> <course> show files in a specific course from a specific
                              semester
-    add <course> <folder> <target> [--sem <semster>] [--regex <regex>]
-                             add a folder to the sync-list (it will sync with 
-                             'dgc pull'). If no semester is specified, the 
-                             current semester is assumed. If a regex is 
-                             specified, only files matching it will be 
+
+handling downloads: ('downloads' can be shortened to 'dl')
+
+    downloads [show]         list all entries in the sync-list
+    downloads add <course> <folder> <target> [--sem <semster>] [--regex <regex>]
+                             add a folder to the sync-list (it will sync with
+                             'dgc pull'). If no semester is specified, the
+                             current semester is assumed. If a regex is
+                             specified, only files matching it will be
                              downloaded
+    downloads remove <id>    remove download with specified id
     pull [-f|--fetch] [--threads <threadcount>]
-                             download all files from the folders on the 
-                             sync-list to their destinations. If not specified, 
-                             16 concurrent downloads are started
+                             download all files from the folders on the
+                             sync-list to their destinations. If not specified,
+                             32 concurrent downloads are started
 """)
 
-diggicamp.save(dgc, cfg_file)
+diggicamp.save(dgc, CFG_FILE)

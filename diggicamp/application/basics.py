@@ -37,19 +37,23 @@ def pull(dgc: Diggicamp, threads: int = 16):
     dgc.download_cached_folders(threads=threads)
 
 
-def add_download(dgc: Diggicamp, folder_id: str, target: str, pattern=None):
+def add_download(dgc: Diggicamp, folder_id: str, target: str, regex=None):
     """
-    Add/modify an entry to the list of folders we want to download
+    Add an entry to the list of folders we want to download
         folder_id: the id of the folder we want to download
         target: the target directory, where we want to download the folder
-        pattern (opt): a regex pattern which files need to match, in order to be downloaded
+        regex (opt): a regex pattern which files need to match, in order to be downloaded
     """
-    if pattern:
-        entry = {
-            'target': target,
-            'pattern': pattern
-        }
-    else:
-        entry = target
 
-    dgc.conf.set('downloads.' + folder_id, entry)
+    entry = {
+        'folder': folder_id,
+        'target': target
+    }
+
+    if regex:
+        entry['regex'] = regex
+
+    if not dgc.conf.get('downloads'):
+        dgc.conf.set('downloads', [entry])
+    else:
+        dgc.conf.get('downloads').append(entry)

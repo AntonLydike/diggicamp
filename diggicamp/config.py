@@ -1,9 +1,15 @@
 import json
 
 
+CONFIG_VERSION = "1.1.0"
+
+
 class DiggicampConf:
     def __init__(self, settings: object):
         self.opts = settings
+
+        if settings['version'] != CONFIG_VERSION:
+            print("different version detected")
 
     def get(self, key: str) -> str:
         obj = self.opts
@@ -47,6 +53,9 @@ class DiggicampConf:
         else:
             raise Exception("Unknown auth method!")
 
+    def version(self):
+        return self.get('version')
+
     @staticmethod
     def fromFile(fname: str) -> 'DiggicampConf':
         with open(fname, "r") as f:
@@ -60,4 +69,5 @@ class DiggicampConf:
     def default() -> 'DiggicampConf':
         conf = DiggicampConf({})
         conf.set('baseurl', 'https://digicampus.uni-augsburg.de/')
+        conf.set('version', CONFIG_VERSION)
         return conf

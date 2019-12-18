@@ -2,4 +2,3 @@ BeautifulSoup4
 lxml
 requests
 clint
-multiprocessing

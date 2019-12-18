@@ -60,3 +60,7 @@ def course_by_id(dgc: Diggicamp, course_id: str):
         for course in semester['courses']:
             if course['id'] == course_id:
                 return course
+
+
+def folder_by_id(dgc: Diggicamp, folder_id: str):
+    return dgc.get_cached_folder(folder_id)

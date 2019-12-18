@@ -31,23 +31,28 @@ commands:
                              initialize a new config file
     fetch [--threads <threadcount>]
                              refresh semester, courses, folders and files. Use
-                             <threadcount> threads for this (default 16)
+                             <threadcount> threads for this (default 32)
     show [--all]             show courses for the current (or all) semesters
     show <semester>          show courses in a specific semester
-    show <course>            show files in a specific course from the current 
+    show <course>            show files in a specific course from the current
                              semester
     show <semester> <course> show files in a specific course from a specific
                              semester
-    add <course> <folder> <target> [--sem <semster>] [--regex <regex>]
-                             add a folder to the sync-list (it will sync with 
-                             'dgc pull'). If no semester is specified, the 
-                             current semester is assumed. If a regex is 
-                             specified, only files matching it will be 
+
+handling downloads: ('downloads' can be shortened to 'dl')
+
+    downloads [show]         list all entries in the sync-list
+    downloads add <course> <folder> <target> [--sem <semster>] [--regex <regex>]
+                             add a folder to the sync-list (it will sync with
+                             'dgc pull'). If no semester is specified, the
+                             current semester is assumed. If a regex is
+                             specified, only files matching it will be
                              downloaded
+    downloads remove <id>    remove download with specified id
     pull [-f|--fetch] [--threads <threadcount>]
-                             download all files from the folders on the 
-                             sync-list to their destinations. If not specified, 
-                             16 concurrent downloads are started
+                             download all files from the folders on the
+                             sync-list to their destinations. If not specified,
+                             32 concurrent downloads are started
 ```
 
 ### Python package
@@ -73,7 +78,7 @@ dgc.conf.add_auth('plain', username="", password="")
 add_download(dgc, folder_id, target_path) # optional pattern arg
 
 # download all configured folders
-pull(dgc, threads=32)
+pull(dgc, threads=64)
 
 ## Helpers:
 
@@ -98,6 +103,26 @@ print_courses(dgc, all=True)
 print_curses(dgc, course)
 ```
 
+# structure of the config file
+The config file is json. It has the following entries:
+* `version`: a version string representing the version of diggicamp
+* `baseurl`: the base url of the digicampus website
+* `credentials`: the credentials. Format for this is:
+  * `mode`: the credential mode used. At the moment, only `plain` is supported, where the credentials fields `username` and `password` hold the plaintext username and password
+* `courses`: an array of the courses. Sorted in descending order, so the first element is the current semester
+* `files`: file list, structured like this: 
+  * `files.course_id.folder_id`:
+    * `id`: folder id 
+    * `name`: file name
+    * `files`: files contained in this folder, each file has the following fields:
+      * `id`: file id
+      * `name`: file name (displayed, no file ending)
+      * `fname`: file name (real, with file ending)
+* `downloads`: A list of downlaod rules with these fields:
+  * `folder`: id of the folder
+  * `target`: path where to download
+  * `regex`: (optional) a regex files not matching will be ignored
+* `cookies`: session cookies, used internally
 
 # TO-DO:
 
