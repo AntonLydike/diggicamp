@@ -27,8 +27,10 @@ other args:
 
 commands:
 
-    init [<url>] --user <username> --pass <password>
-                             initialize a new config file
+    init [<url>] --user <username> [--pass <password>]
+                             initialize a new config file. if no password is 
+                             specified, you will be prompted, everytime it is
+                             required (not very often).
     fetch [--threads <threadcount>]
                              refresh semester, courses, folders and files. Use
                              <threadcount> threads for this (default 32)
@@ -108,7 +110,9 @@ The config file is json. It has the following entries:
 * `version`: a version string representing the version of diggicamp
 * `baseurl`: the base url of the digicampus website
 * `credentials`: the credentials. Format for this is:
-  * `mode`: the credential mode used. At the moment, only `plain` is supported, where the credentials fields `username` and `password` hold the plaintext username and password
+  * `mode`: the credential mode used. Available modes:
+    * `plain`: The credentials are stored in plaintext in the fields `username` and `password`
+    * `prompt`: Ask the user for his password every time login is required (this does not happen often, as the session is saved between executions)
 * `courses`: an array of the courses. Sorted in descending order, so the first element is the current semester
 * `files`: file list, structured like this: 
   * `files.course_id.folder_id`:

@@ -1,3 +1,4 @@
+import os
 from concurrent.futures import ThreadPoolExecutor
 
 from ..scraper import Diggicamp
@@ -10,7 +11,10 @@ def d_open(path: str = 'dgc.json'):
 
 
 def new(path: str = "dgc.json"):
-    conf = DiggicampConf.default()
+    if os.path.isfile(path):
+        print("dgc is already initialized!")
+        return None
+    conf = DiggicampConf.default(url=None)
     conf.save(path)
     return Diggicamp(conf)
 

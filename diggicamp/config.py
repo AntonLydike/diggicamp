@@ -1,15 +1,18 @@
 import json
+import diggicamp
 
 
 CONFIG_VERSION = "1.1.0"
 
 
 class DiggicampConf:
+
     def __init__(self, settings: object):
         self.opts = settings
 
-        if 'version' in settings != CONFIG_VERSION:
+        if 'version' not in settings or settings['version'] != CONFIG_VERSION:
             print("different version detected")
+            diggicamp.migrate_config(self)
 
     def get(self, key: str) -> str:
         obj = self.opts
@@ -60,8 +63,7 @@ class DiggicampConf:
         return DiggicampConf(json.loads(string))
 
     @staticmethod
-    def default() -> 'DiggicampConf':
-        conf = DiggicampConf({})
-        conf.set('baseurl', 'https://digicampus.uni-augsburg.de/')
-        conf.set('version', CONFIG_VERSION)
+    def default(url: str) -> 'DiggicampConf':
+        conf = DiggicampConf({'version': CONFIG_VERSION})
+        conf.set('baseurl', url)
         return conf

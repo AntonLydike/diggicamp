@@ -1,7 +1,16 @@
-from .config import DiggicampConf, CONFIG_VERSION
+from .config import CONFIG_VERSION, DiggicampConf
 
+
+"""
+This file contains migrations for the config files
+
+Each function MIGRATIONS[<version>] is a migration from <version> to a newer one
+the function set's the new version in the settings object. 
+"""
 
 # migrate from no version tag to version tag
+
+
 def migrate_none(conf: DiggicampConf):
     print("Migrating to version 1.1.0...")
     conf.set('version', '1.1.0')
@@ -35,10 +44,10 @@ MIGRATIONS = {
 def migrate_config(conf: DiggicampConf):
     while conf.version() != CONFIG_VERSION:
         if conf.version() == None:
-            conf = MIGRATIONS['None'](conf)
+            MIGRATIONS['None'](conf)
             continue
 
         if conf.version() in MIGRATIONS:
-            conf = MIGRATIONS[conf.version()](conf)
+            MIGRATIONS[conf.version()](conf)
         else:
             raise Exception("Cannot migrate from " + conf.version() + " - No migration found!")

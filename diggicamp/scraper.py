@@ -1,6 +1,7 @@
-import requests
-import urllib
 import os
+import urllib
+import requests
+from getpass import getpass
 from concurrent.futures import ThreadPoolExecutor
 
 from .exceptions import WebException, NotLoggedInScepion
@@ -23,7 +24,9 @@ class Diggicamp:
 
     def login(self):
         print("logging in...")
-        print("authed: {}".format(self.authed))
+        if self.verbose:
+            print("authed: {}".format(self.authed))
+
         html = self._get('/?sso=webauth&cancel_login=1&again=yes', unauthed=True)
 
         if not self.conf.has('credentials'):
@@ -32,6 +35,10 @@ class Diggicamp:
         if self.conf.get('credentials.mode') == 'plain':
             user = self.conf.get('credentials.username')
             pw = self.conf.get('credentials.password')
+        elif self.conf.get('credentials.mode') == 'prompt':
+            user = self.conf.get('credentials.username')
+            pw = getpass(prompt="Digicampus password: ")
+            print("finishing login...")
         else:
             raise Exception("Unknown auth mode: " + self.conf.get('credentials.mode'))
 
@@ -125,7 +132,8 @@ with the correct course to initially fetch the folder""")
 
         if resp.ok:
             if not unauthed and self.authed and is_not_logged_in(resp):
-                print("lost auth in: {} with unauthed={}".format(url, unauthed))
+                if self.verbose:
+                    print("lost auth in: {} with unauthed={}".format(url, unauthed))
                 self._deauth()
                 return self._get(url, base)
 
@@ -148,7 +156,8 @@ with the correct course to initially fetch the folder""")
         if resp.ok:
             if not unauthed and self.authed and is_not_logged_in(resp):
                 self._deauth()
-                print("lost auth...")
+                if self.verbose:
+                    print("lost auth in: {} with unauthed={}".format(url, unauthed))
                 return self._post(url, data, base)
 
             if self.verbose:
@@ -156,7 +165,6 @@ with the correct course to initially fetch the folder""")
 
             return resp.text
         else:
-            print(resp.text)
             raise WebException("POST to " + url + " failed", resp)
 
     def _download(self, url: str, target: str, base=None):
@@ -171,6 +179,8 @@ with the correct course to initially fetch the folder""")
         if resp.ok:
             if self.authed and is_not_logged_in(resp):
                 self._deauth()
+                if self.verbose:
+                    print("lost auth in: {} with unauthed={}".format(url, unauthed))
                 return self._download(url, target, base)
 
             if self.verbose:

@@ -49,9 +49,18 @@ THREADS = int(get_arg('--threads', 32))
 # first, check for init
 if ARG0 == 'init':
     dgc = diggicamp.new(CFG_FILE)
+
+    # error while initializing (config file already exists, etc)
+    if not dgc:
+        exit(1)
+
     usr = get_arg('--user')
-    pw = get_arg('--pass')
-    dgc.conf.add_auth('plain', username=usr, password=pw)
+    pw = get_arg('--pass', optional=True)
+
+    if not pw:
+        dgc.conf.add_auth('prompt', username=usr)
+    else:
+        dgc.conf.add_auth('plain', username=usr, password=pw)
 
     if args.grouped.get('_')[1]:
         dgc.conf.set('baseurl', args.grouped.get('_')[1])
@@ -168,8 +177,10 @@ other args:
 
 commands:
 
-    init [<url>] --user <username> --pass <password>
-                             initialize a new config file
+    init [<url>] --user <username> [--pass <password>]
+                             initialize a new config file. if no password is 
+                             specified, you will be prompted, everytime it is
+                             required (not very often).
     fetch [--threads <threadcount>]
                              refresh semester, courses, folders and files. Use
                              <threadcount> threads for this (default 32)
