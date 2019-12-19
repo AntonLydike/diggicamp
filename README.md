@@ -44,12 +44,12 @@ commands:
 handling downloads: ('downloads' can be shortened to 'dl')
 
     downloads [show]         list all entries in the sync-list
-    downloads add <course> <folder> <target> [--sem <semster>] [--regex <regex>]
-                             add a folder to the sync-list (it will sync with
-                             'dgc pull'). If no semester is specified, the
-                             current semester is assumed. If a regex is
-                             specified, only files matching it will be
-                             downloaded
+    downloads add <course> [<folder>] <target> [--sem <semster>] [--regex <regex>]
+                             add a folder (or all folders) of a course to the 
+                             sync-list (it will sync with 'dgc pull'). If no 
+                             semester is specified, the current semester is 
+                             assumed. If a regex is specified, only files 
+                             matching it will be downloaded
     downloads remove <id>    remove download with specified id
     pull [-f|--fetch] [--threads <threadcount>]
                              download all files from the folders on the

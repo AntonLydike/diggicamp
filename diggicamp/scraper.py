@@ -2,7 +2,6 @@ import os
 import urllib
 import requests
 from getpass import getpass
-from concurrent.futures import ThreadPoolExecutor
 
 from .exceptions import WebException, NotLoggedInScepion
 from .pages import login, courses, course_files
@@ -88,39 +87,6 @@ class Diggicamp:
 
         return None
 
-    def download_cached_folders(self, threads: int = 32):
-        if not self.conf.get('downloads'):
-            print("No downloads configured")
-            return
-
-        downloads = self.conf.get('downloads')
-
-        if threads < 1:
-            raise Exception("downloading cannot happen with fewer than 1 threads!")
-
-        exec = ThreadPoolExecutor(max_workers=threads)
-
-        for rule in downloads:
-            target = rule['target']
-            fid = rule['folder']
-
-            folder = self.get_cached_folder(fid)
-            if not folder:
-                print(f"""Folder {fid} (targeting {target}) is not in the cache!
-
-Run
-    dgc show <course>
-with the correct course to initially fetch the folder""")
-                continue
-
-            if not os.path.exists(target):
-                os.makedirs(target)
-
-            for file in folder['files']:
-                exec.submit(self._download_file, target, file)
-
-        exec.shutdown()
-
     def _get(self, url: str, base=None, unauthed: bool = False):
         if not unauthed and not self.authed:
             self.login()
@@ -180,7 +146,7 @@ with the correct course to initially fetch the folder""")
             if self.authed and is_not_logged_in(resp):
                 self._deauth()
                 if self.verbose:
-                    print("lost auth in: {} with unauthed={}".format(url, unauthed))
+                    print("lost auth during download of: {}".format(url))
                 return self._download(url, target, base)
 
             if self.verbose:

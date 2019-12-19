@@ -118,13 +118,18 @@ elif ARG0 == 'downloads' or ARG0 == 'dl':
 
     if not ARG1 or ARG1 == 'show':
         diggicamp.print_download_definitions(dgc)
+
     elif ARG1 == 'add':
         course_name = args.grouped.get('_')[2]
         folder_name = args.grouped.get('_')[3]
         target = args.grouped.get('_')[4]
 
-        if not course_name or not folder_name or not target:
-            print("correct syntax is: add <course> <folder> <path> [--sem <semester>] [--regex <regex>]")
+        if not target:
+            target = folder_name
+            folder_name = None
+
+        if not course_name or not target:
+            print("correct syntax is: add <course> [<folder>] <path> [--sem <semester>] [--regex <regex>]")
             exit(1)
 
         regex = get_arg('--regex', optional=True)
@@ -135,16 +140,20 @@ elif ARG0 == 'downloads' or ARG0 == 'dl':
             print(f"No course found for \"{course_name}\"")
             exit(1)
 
-        folder = diggicamp.folder_by_name(dgc, folder_name, course)
+        if not folder_name:
+            diggicamp.add_download_course(dgc, course['id'], target, regex)
+        else:
+            folder = diggicamp.folder_by_name(dgc, folder_name, course)
 
-        if not folder:
-            print(f"No folder named \"{folder_name}\" found!")
-            exit(1)
+            if not folder:
+                print(f"No folder named \"{folder_name}\" found!")
+                exit(1)
 
-        diggicamp.add_download(dgc, folder['id'], target, regex)
+            diggicamp.add_download(dgc, folder['id'], target, regex)
 
         puts(colored.blue("Added download rule:\n", bold=True))
         diggicamp.print_download_definitions(dgc)
+
     elif ARG1 == 'remove':
         index = int(args.grouped.get('_')[2])
         dls: list = dgc.conf.get('downloads')
@@ -194,12 +203,12 @@ commands:
 handling downloads: ('downloads' can be shortened to 'dl')
 
     downloads [show]         list all entries in the sync-list
-    downloads add <course> <folder> <target> [--sem <semster>] [--regex <regex>]
-                             add a folder to the sync-list (it will sync with
-                             'dgc pull'). If no semester is specified, the
-                             current semester is assumed. If a regex is
-                             specified, only files matching it will be
-                             downloaded
+    downloads add <course> [<folder>] <target> [--sem <semster>] [--regex <regex>]
+                             add a folder (or all folders) of a course to the 
+                             sync-list (it will sync with 'dgc pull'). If no 
+                             semester is specified, the current semester is 
+                             assumed. If a regex is specified, only files 
+                             matching it will be downloaded
     downloads remove <id>    remove download with specified id
     pull [-f|--fetch] [--threads <threadcount>]
                              download all files from the folders on the
