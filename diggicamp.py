@@ -19,6 +19,7 @@ def get_bool_arg(name: str):
     return args.grouped.get(name) != None
 
 
+# Parse args flags
 args = Args()
 flags = set()
 
@@ -30,17 +31,22 @@ for flag in args.flags.all:
     args.remove(flag)
     flags = flags.union(flag[1:])
 
+# if verbose mode is on, print args
 if 'v' in flags:
     puts(colored.blue('Grouped Arguments: ') + str(dict(args.grouped)))
     puts(colored.blue('Flags: ') + str(flags))
     print()
 
+# get first arg
 ARG0 = args.grouped.get('_')[0]
 
+# get config file location
 CFG_FILE = get_arg('--cfg', 'dgc.json')
 
+# get number of threads
 THREADS = int(get_arg('--threads', 32))
 
+# first, check for init
 if ARG0 == 'init':
     dgc = diggicamp.new(CFG_FILE)
     usr = get_arg('--user')
@@ -53,10 +59,11 @@ if ARG0 == 'init':
     exit(0)
 
 
+# if we are not in init mode, try to read the config file
 if os.path.isfile(CFG_FILE):
     dgc = diggicamp.d_open(CFG_FILE)
     dgc.verbose = 'v' in flags
-else:
+elif ARG0 and ARG0 != 'help':
     print("Diggicamp is not configured! Run\n\n    dgc init <url> --user <user> --pass <password>\n\nto initialize a new config")
     exit(1)
 
@@ -188,5 +195,6 @@ handling downloads: ('downloads' can be shortened to 'dl')
                              sync-list to their destinations. If not specified,
                              32 concurrent downloads are started
 """)
+    exit(0)
 
 diggicamp.save(dgc, CFG_FILE)

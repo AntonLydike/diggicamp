@@ -44,14 +44,8 @@ class DiggicampConf:
         return True
 
     def add_auth(self, mode, **args):
-        if mode == 'plain':
-            self.set('credentials', {
-                'mode': 'plain',
-                'username': args['username'],
-                'password': args['password']
-            })
-        else:
-            raise Exception("Unknown auth method!")
+        args['mode'] = mode
+        self.set('credentials', args)
 
     def version(self):
         return self.get('version')
