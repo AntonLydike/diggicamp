@@ -36,6 +36,7 @@ def fetch(dgc: Diggicamp, threads: int = 32):
         exec.submit(dgc.get_files, course, cached=False)
 
     exec.shutdown()
+    print("\nUpdated folders!")
 
 
 def add_download(dgc: Diggicamp, folder_id: str, target: str, regex=None):

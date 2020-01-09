@@ -71,7 +71,6 @@ class Diggicamp:
         if cached and self.conf.has('files.' + course_id):
             return self.conf.get('files.' + course_id)
 
-        print("searching server for folder contents...")
         files = course_files.CourseFiles(self, course_id).getFileTree()
 
         self.conf.set('files.' + course_id, files)

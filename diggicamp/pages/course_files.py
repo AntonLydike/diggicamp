@@ -20,6 +20,10 @@ class CourseFiles:
 
         root = dom.find('div', id='folder_subfolders_root')
 
+        # initialize a asynchronous callback collection
+        # everyone can call add_to_bag to add a return value to the collection
+        (get_bag, add_to_bag) = create_bag()
+
         for froot in root.children:
             # what we want to know about this folder
             id = None
@@ -36,15 +40,10 @@ class CourseFiles:
                     print("no folder id discovered!\n" + froot.prettify())
                     continue
 
-            folder = {
-                'id': id,
-                'name': unicode(" ".join(froot.find(id=f'folder_{id}_header').stripped_strings)),
-                'files': []
-            }
-            folders[id] = folder
+            name = unicode(" ".join(froot.find(id=f'folder_{id}_header').stripped_strings))
 
             # start a thread to download folder contents
-            thread = threading.Thread(target=process_folder_async, args=(self.dgc, self.id, folder))
+            thread = threading.Thread(target=process_folder_async, args=(self.dgc, self.id, id, name, add_to_bag))
             thread.start()
             threads.append(thread)
 
@@ -52,18 +51,40 @@ class CourseFiles:
         for thread in threads:
             thread.join()
 
+        count = 0
+        for folder in get_bag():
+            folders[folder['id']] = folder
+            count += 1
+
         return folders
 
 
-def process_folder_async(diggicamp, course: str, folder: dict):
-    id = folder['id']
-    html = diggicamp._post(f'/folder.php?cid={course}&data%5Bcmd%5D=tree&open={id}', data='')
+def process_folder_async(diggicamp, course: str, id: str, name: str, add_folder):
+    # print a little progress indicator
+    print('.', end='', flush=True)
+
+    html = diggicamp._post(f'/folder.php?cid={course}&data%5Bcmd%5D=tree&open={id}', data=f'getfolderbody={id}')
     dom = ParsedPage(html).dom
+
+    folder = {
+        'id': id,
+        'name': name,
+        'files': []
+    }
 
     fcontainer = dom.find(id=f'folder_{id}', class_='folder_container')
 
-    # TODO: parse subfolders recursively (maybe even with more threads?)
-    # subfolders are contained inside this div: <div class="folder_container" id="folder_subfolders_ae1fd77a82bd4d1e74350e88ada5e58a"></div>
+    # query subfolders
+    subfolders = dom.find(id=f'folder_subfolders_{id}', class_='folder_container')
+    #print("found " + str(len(subfolders.find_all('div', recoursive=False))))
+    if subfolders:
+        for subfolder in subfolders.findChildren('div', recoursive=False):
+            idfield = subfolder.find(id=re.compile('^getmd5'))
+            if not idfield:
+                continue  # this happens quite often and is not a sign of failure on our side, rather digicampus being derpy
+            subid = unicode(" ".join(idfield.stripped_strings))
+            subname = unicode(" ".join(subfolder.find(id=f'folder_{subid}_header').stripped_strings))
+            process_folder_async(diggicamp, course, subid, subname, add_folder)
 
     if not fcontainer:
         return
@@ -98,3 +119,21 @@ def process_folder_async(diggicamp, course: str, folder: dict):
             'name': unicode(" ".join(file.find(id=f'file_{id}_header').stripped_strings)),
             'fname': fname
         })
+        print('.', end='', flush=True)
+
+    add_folder(folder)
+
+
+# async folder collection
+# call add_to_bag to add a value
+# call get_bag to get all current contents
+def create_bag():
+    bag = []
+
+    def get_bag():
+        return bag
+
+    def add_to_bag(item):
+        bag.append(item)
+
+    return (get_bag, add_to_bag)
