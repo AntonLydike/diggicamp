@@ -82,7 +82,7 @@ def process_folder_async(diggicamp, course: str, folder: dict):
         if not link:
             raise Exception("link not found!")
 
-        if not 'href' in link:
+        if not 'href' in link.attrs:
             # if file is not downloadable, skip it
             continue
 
