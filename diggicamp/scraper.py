@@ -179,4 +179,4 @@ class Diggicamp:
 
 def is_not_logged_in(resp: requests.Response) -> bool:
     # user is not logged in, if we get a html page back which contains the following text
-    return resp.headers['Content-Type'] == 'text/html' and '<!-- Startseite (nicht eingeloggt) -->' in resp.text
+    return resp.headers['Content-Type'] == 'text/html' and ('<!-- Startseite (nicht eingeloggt) -->' in resp.text or '<table class="index_box logintable"' in resp.text)
