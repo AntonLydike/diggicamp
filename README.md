@@ -127,6 +127,7 @@ The config file is json. It has the following entries:
   * `target`: path where to download
   * `regex`: (optional) a regex files not matching will be ignored
 * `cookies`: session cookies, used internally
+* `downloaded_version`: The versions of the downloaded files to prevent double downloads
 
 # TO-DO:
 
