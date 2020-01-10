@@ -36,8 +36,17 @@ def migrate_none(conf: DiggicampConf):
     conf.set('downloads', downloads)
 
 
+def migrate_1_1_0(conf: DiggicampConf):
+    print("Migrating to version 1.2.0...")
+    conf.set('version', '1.2.0')
+
+    if not conf.get('downloaded_versions'):
+        conf.set('downloaded_versions', {})
+
+
 MIGRATIONS = {
-    'None': migrate_none
+    'None': migrate_none,
+    '1.1.0': migrate_1_1_0
 }
 
 

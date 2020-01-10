@@ -2,7 +2,7 @@ import json
 import diggicamp
 
 
-CONFIG_VERSION = "1.1.0"
+CONFIG_VERSION = "1.2.0"
 
 
 class DiggicampConf:

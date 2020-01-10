@@ -160,6 +160,13 @@ class Diggicamp:
         id = file['id']
         name = urllib.parse.quote(file['fname'])
 
+        if (self.conf.get('downloaded_versions.' + id) == file['last_mod']):
+            if self.verbose:
+                print("{:<60} → {}".format(file['fname'], "cached"))
+            return
+
+        self.conf.set('downloaded_versions.' + id, file['last_mod'])
+
         ret = self._download(f'/sendfile.php?type=0&file_id={id}&file_name={name}', target_dir + '/' + file['fname'])
 
         print("{:<60} → {}".format(file['fname'], target_dir))

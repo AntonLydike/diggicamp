@@ -1,8 +1,9 @@
 from bs4 import NavigableString
 from .parsedpage import ParsedPage, unicode
+from datetime import datetime
 import threading
-import re
 import requests
+import re
 
 
 class CourseFiles:
@@ -114,10 +115,18 @@ def process_folder_async(diggicamp, course: str, id: str, name: str, add_folder)
 
         fname = requests.utils.unquote(fname.group(1), encoding="1250")
 
+        last_modified_elm = file.find('td', class_='printhead', align='right')
+        if last_modified_elm:
+            last_modified_elm.a.extract()
+            last_modified = last_modified_elm.string.strip()
+        else:
+            last_modified = str(datetime.now())
+
         folder['files'].append({
             'id': id,
             'name': unicode(" ".join(file.find(id=f'file_{id}_header').stripped_strings)),
-            'fname': fname
+            'fname': fname,
+            'last_mod': last_modified
         })
         print('.', end='', flush=True)
 
