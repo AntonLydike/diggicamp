@@ -65,5 +65,8 @@ class DiggicampConf:
     @staticmethod
     def default(url: str) -> 'DiggicampConf':
         conf = DiggicampConf({'version': CONFIG_VERSION})
+        if url[-1] != "/":
+            url = url + "/"
+
         conf.set('baseurl', url)
         return conf
