@@ -147,8 +147,11 @@ class Diggicamp:
             
             if len_written == 0:
                 os.remove(target)
+                return False
             elif self.verbose:
                 print("DOWNLOADED " + str(len_written) + " bytes into " + target)
+
+            return True
         else:
             raise WebException("GET " + base + url + " failed!", resp)
 
@@ -162,11 +165,11 @@ class Diggicamp:
                 print("{:<60} → {}".format(file['fname'], "cached"))
             return
 
-        self.conf.set('downloaded_versions.' + id, file['last_mod'])
-
-        self._download(f'/sendfile.php?type={dl_type}&file_id={id}&file_name={name}', target_dir + '/' + file['fname'])
-
-        print("{:<60} → {}".format(file['fname'], target_dir))
+        if self._download(f'/sendfile.php?type={dl_type}&file_id={id}&file_name={name}', target_dir + '/' + file['fname']):
+            self.conf.set('downloaded_versions.' + id, file['last_mod'])
+            print("{:<60} → {}".format(file['fname'], target_dir))
+        else:
+            print("{:<60} → failed".format(file['fname']))
 
     def _save_cookies(self):
         self.conf.set('cookies', self.session.cookies.get_dict())
