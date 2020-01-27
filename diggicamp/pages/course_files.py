@@ -109,9 +109,17 @@ def process_folder_async(diggicamp, course: str, id: str, name: str, add_folder)
             continue
 
         fname = re.search(r'file_name=([^&]+)', link['href'])
+        ftype = re.search(r'type=([0-9]+)', link['href'])
 
         if not fname:
             raise Exception('link url has invalid format')
+
+        if not ftype:
+            print("no download type found: " + link.prettify())
+            ftype = 0
+        else:
+            ftype = ftype.group(1)
+        
 
         fname = requests.utils.unquote(fname.group(1), encoding="1250")
 
@@ -127,6 +135,7 @@ def process_folder_async(diggicamp, course: str, id: str, name: str, add_folder)
             'id': id,
             'name': unicode(" ".join(file.find(id=f'file_{id}_header').stripped_strings)),
             'fname': fname,
+            'type': ftype,
             'last_mod': last_modified
         })
         print('.', end='', flush=True)

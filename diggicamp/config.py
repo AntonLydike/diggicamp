@@ -35,7 +35,7 @@ class DiggicampConf:
 
     def save(self, file: str):
         with open(file, "w") as f:
-            f.write(json.dumps(self.opts, indent=2))
+            f.write(json.dumps(self.opts, indent=2, default=lambda o: '<not serializable>'))
 
     def has(self, key: str):
         obj = self.opts

@@ -102,9 +102,6 @@ class Diggicamp:
                 self._deauth()
                 return self._get(url, base)
 
-            if self.verbose:
-                print("GET " + url + " - OK")
-
             return resp.text
         else:
             raise WebException("Response is not valid!", base + url, resp)
@@ -125,9 +122,6 @@ class Diggicamp:
                     print("lost auth in: {} with unauthed={}".format(url, unauthed))
                 return self._post(url, data, base)
 
-            if self.verbose:
-                print("POST " + url + " - OK")
-
             return resp.text
         else:
             raise WebException("POST to " + url + " failed", resp)
@@ -139,25 +133,28 @@ class Diggicamp:
         if base == None:
             base = self.conf.get('baseurl')
 
-        resp: requests.Response = self.session.get(base + url)
+        resp: requests.Response = self.session.get(base + url, stream=True)
+
+        if self.verbose:
+            print("Downloading " + base + url)
 
         if resp.ok:
-            if self.authed and is_not_logged_in(resp):
-                self._deauth()
-                if self.verbose:
-                    print("lost auth during download of: {}".format(url))
-                return self._download(url, target, base)
-
-            if self.verbose:
-                print("GET [DOWNLOAD] " + url + " - OK")
-
+            len_written = 0
             with open(target, "wb") as f:
-                f.write(resp.content)
+                for chunk in resp.iter_content(chunk_size=8192):
+                    f.write(chunk)
+                    len_written += len(chunk)
+            
+            if len_written == 0:
+                os.remove(target)
+            elif self.verbose:
+                print("DOWNLOADED " + str(len_written) + " bytes into " + target)
         else:
             raise WebException("GET " + base + url + " failed!", resp)
 
     def _download_file(self, target_dir: str, file: dict):
         id = file['id']
+        dl_type = file['type'] if 'type' in file else 0
         name = urllib.parse.quote(file['fname'])
 
         if (self.conf.get('downloaded_versions.' + id) == file['last_mod']):
@@ -167,10 +164,9 @@ class Diggicamp:
 
         self.conf.set('downloaded_versions.' + id, file['last_mod'])
 
-        ret = self._download(f'/sendfile.php?type=0&file_id={id}&file_name={name}', target_dir + '/' + file['fname'])
+        self._download(f'/sendfile.php?type={dl_type}&file_id={id}&file_name={name}', target_dir + '/' + file['fname'])
 
         print("{:<60} → {}".format(file['fname'], target_dir))
-        return ret
 
     def _save_cookies(self):
         self.conf.set('cookies', self.session.cookies.get_dict())

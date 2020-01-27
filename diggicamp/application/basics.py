@@ -11,11 +11,11 @@ def d_open(path: str = 'dgc.json'):
     return Diggicamp(conf)
 
 
-def new(path: str = "dgc.json"):
+def new(url: str, path: str = "dgc.json"):
     if os.path.isfile(path):
         print("dgc is already initialized!")
         return None
-    conf = DiggicampConf.default(url=None)
+    conf = DiggicampConf.default(url)
     conf.save(path)
     return Diggicamp(conf)
 

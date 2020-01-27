@@ -48,7 +48,7 @@ THREADS = int(get_arg('--threads', 32))
 
 # first, check for init
 if ARG0 == 'init':
-    dgc = diggicamp.new(CFG_FILE)
+    dgc = diggicamp.new(args.grouped.get('_')[1],CFG_FILE)
 
     # error while initializing (config file already exists, etc)
     if not dgc:
@@ -62,8 +62,6 @@ if ARG0 == 'init':
     else:
         dgc.conf.add_auth('plain', username=usr, password=pw)
 
-    if args.grouped.get('_')[1]:
-        dgc.conf.set('baseurl', args.grouped.get('_')[1])
     diggicamp.save(dgc, CFG_FILE)
     exit(0)
 
