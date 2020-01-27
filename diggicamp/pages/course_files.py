@@ -117,7 +117,8 @@ def process_folder_async(diggicamp, course: str, id: str, name: str, add_folder)
 
         last_modified_elm = file.find('td', class_='printhead', align='right')
         if last_modified_elm:
-            last_modified_elm.a.extract()
+            if last_modified_elm.a:
+                last_modified_elm.a.extract()
             last_modified = last_modified_elm.string.strip()
         else:
             last_modified = str(datetime.now())
