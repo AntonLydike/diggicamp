@@ -3,9 +3,20 @@
 Scrape your digicampus (that use a very specific single sign-on)
 
 
+## Installation
+
+### Nix-OS
+
+When using [nixos](https://nixos.org) (the superior OS), you can use the nix-wrapper `diggicamp-nix.sh` that automatically loads dependencies. Just symlink it into your desired PATH folder and everything will be taken care of.
+
+### Other
+
+On all other (inferior) OS, you need to install python yourself and then install the dependencies (manually): `pip3 install -r requriements.txt`.
+
 ## Usage
 
 This... thing... exposes a couple of ways to interact with it:
+
 
 ### CLI
 to use the cli, link the `diggicamp.py` script anywhere to your path (alias is `dgc` or something like that) and then use it like this:
