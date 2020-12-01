@@ -143,6 +143,7 @@ def download_course(dgc: Diggicamp, download_rule: dict, exec: ThreadPoolExecuto
     if not folders:
         print("Course {} is not cached! Run\n\n    dgc show <course name>\n\n\
         to download the course details into the local cache!".format(download_rule['course']))
+        return
 
     for fid in folders:
         rule = download_rule.copy()
