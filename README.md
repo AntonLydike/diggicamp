@@ -5,13 +5,13 @@ Scrape your digicampus (that use a very specific single sign-on)
 
 ## Installation
 
-### Nix-OS
+### Self-contained inside virtual environment:
 
-When using [nixos](https://nixos.org) (the superior OS), you can use the nix-wrapper `diggicamp-nix.sh` that automatically loads dependencies. Just symlink it into your desired PATH folder and everything will be taken care of.
+If you don't want to install anything, just use `diggicamp-venv.sh` that automatically loads dependencies inside a virtual environment. Just symlink it into your desired PATH folder and everything will be taken care of. If you have any problems with the virtual environment, the script intercepts the `install` argument and reinstalls all dependencies again if supplied.
 
 ### Other
 
-On all other (inferior) OS, you need to install python yourself and then install the dependencies (manually): `pip3 install -r requriements.txt`.
+If you feel the need to polute your global python package space, you can install dependencies manually by running `pip install -r requirements.txt`. You should probably not do this.
 
 ## Usage
 
