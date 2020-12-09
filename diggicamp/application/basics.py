@@ -141,12 +141,17 @@ def download_course(dgc: Diggicamp, download_rule: dict, exec: ThreadPoolExecuto
     folders = dgc.conf.get('files.' + download_rule['course'])
 
     if not folders:
-        print("Course {} is not cached! Run\n\n    dgc show <course name>\n\n\
-        to download the course details into the local cache!".format(download_rule['course']))
-        return
+        course = course_by_id(dgc, download_rule['course'])
+        folders = dgc.get_files(course['id'])
 
     for fid in folders:
         rule = download_rule.copy()
         rule['folder'] = fid
         rule['target'] += '/' + folders[fid]['name']
         download_folder(dgc, rule, exec)
+
+
+def clean_config(dgc: Diggicamp):
+    dgc.conf.cleanup()
+
+

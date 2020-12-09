@@ -53,6 +53,20 @@ class DiggicampConf:
     def version(self):
         return self.get('version')
 
+    def cleanup(self):
+        delkeys = ['files', 'downloads', 'downloaded_versions']
+        for key in delkeys:
+            if self.has(key):
+                # get path to parent
+                parent = '.'.join(key.split('.')[0:-1])
+                if not parent:
+                    obj = self.opts
+                else:
+                    obj = self.get(parent)
+                # remove object from dict
+                del obj[key.split('.')[-1]]
+
+
     @staticmethod
     def fromFile(fname: str) -> 'DiggicampConf':
         with open(fname, "r") as f:

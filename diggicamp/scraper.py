@@ -92,6 +92,8 @@ class Diggicamp:
 
         if base == None:
             base = self.conf.get('baseurl')
+        
+        resp = self.session.get(base + url)
 
         if resp.ok:
             if not unauthed and self.authed and is_not_logged_in(resp):
@@ -99,7 +101,6 @@ class Diggicamp:
                     print("lost auth in: {} with unauthed={}".format(url, unauthed))
                 self._deauth()
                 return self._get(url, base)
-            print(resp.text)
             return resp.text
         else:
             raise WebException("Response is not valid!", base + url, resp)
