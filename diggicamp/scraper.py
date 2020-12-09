@@ -93,15 +93,13 @@ class Diggicamp:
         if base == None:
             base = self.conf.get('baseurl')
 
-        resp = self.session.get(base + url)
-
         if resp.ok:
             if not unauthed and self.authed and is_not_logged_in(resp):
                 if self.verbose:
                     print("lost auth in: {} with unauthed={}".format(url, unauthed))
                 self._deauth()
                 return self._get(url, base)
-
+            print(resp.text)
             return resp.text
         else:
             raise WebException("Response is not valid!", base + url, resp)
@@ -184,4 +182,4 @@ class Diggicamp:
 
 def is_not_logged_in(resp: requests.Response) -> bool:
     # user is not logged in, if we get a html page back which contains the following text
-    return resp.headers['Content-Type'] == 'text/html' and ('<!-- Startseite (nicht eingeloggt) -->' in resp.text or '<table class="index_box logintable"' in resp.text)
+    return resp.headers['Content-Type'] == 'text/html' and ('<button type="submit" class="accept button" name="Login">Anmelden</button>' in resp.text or '<form class="default" name="login"' in resp.text)
