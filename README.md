@@ -51,6 +51,9 @@ commands:
                              semester
     show <semester> <course> show files in a specific course from a specific
                              semester
+    clean                    cleans cached folders and files, deletes all 
+                             downloads. This can be used to easily clean up
+                             all state after the semester is completed
 
 handling downloads: ('downloads' can be shortened to 'dl')
 
