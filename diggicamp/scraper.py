@@ -183,4 +183,4 @@ class Diggicamp:
 
 def is_not_logged_in(resp: requests.Response) -> bool:
     # user is not logged in, if we get a html page back which contains the following text
-    return resp.headers['Content-Type'] == 'text/html' and ('<button type="submit" class="accept button" name="Login">Anmelden</button>' in resp.text or '<form class="default" name="login"' in resp.text)
+    return resp.headers['Content-Type'] == 'text/html' and ('<button type="submit" class="accept button" name="Login">Anmelden</button>' in resp.text or '<form class="default" name="login"' in resp.text or '<!-- Startseite (nicht eingeloggt) -->' in resp.text)
