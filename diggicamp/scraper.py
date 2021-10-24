@@ -81,7 +81,7 @@ class Diggicamp:
         folders = self.conf.get('files')
 
         for course in folders.values():
-            if fid in course:
+            if course is not None and fid in course:
                 return course[fid]
 
         return None
