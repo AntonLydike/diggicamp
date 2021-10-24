@@ -22,7 +22,7 @@ class Diggicamp:
             requests.utils.add_dict_to_cookiejar(self.session.cookies, conf.get('cookies'))
 
     def login(self):
-        print("logging in...")
+        print("Logging in...")
         if self.verbose:
             print("authed: {}".format(self.authed))
 
@@ -37,7 +37,7 @@ class Diggicamp:
         elif self.conf.get('credentials.mode') == 'prompt':
             user = self.conf.get('credentials.username')
             pw = getpass(prompt="Digicampus password: ")
-            print("finishing login...")
+            print("Finishing login...")
         else:
             raise Exception("Unknown auth mode: " + self.conf.get('credentials.mode'))
 
@@ -58,7 +58,7 @@ class Diggicamp:
         if cached and self.conf.has('courses'):
             return self.conf.get('courses')
 
-        print("getting course list from server...")
+        print("Getting course list from server...")
         page = courses.CoursesPage(self._get('/dispatch.php/my_courses'))
 
         courses_ = page.getCourses()
@@ -98,7 +98,7 @@ class Diggicamp:
         if resp.ok:
             if not unauthed and self.authed and is_not_logged_in(resp):
                 if self.verbose:
-                    print("lost auth in: {} with unauthed={}".format(url, unauthed))
+                    print("Lost auth in: {} with unauthed={}".format(url, unauthed))
                 self._deauth()
                 return self._get(url, base)
             return resp.text
@@ -118,7 +118,7 @@ class Diggicamp:
             if not unauthed and self.authed and is_not_logged_in(resp):
                 self._deauth()
                 if self.verbose:
-                    print("lost auth in: {} with unauthed={}".format(url, unauthed))
+                    print("Lost auth in: {} with unauthed={}".format(url, unauthed))
                 return self._post(url, data, base)
 
             return resp.text

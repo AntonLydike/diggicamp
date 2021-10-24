@@ -102,7 +102,7 @@ def process_folder_async(diggicamp, course: str, id: str, name: str, add_folder)
         
         fname = link.text.strip()
         if not fname:
-            raise Exception("filename not found!")
+            raise Exception("Filename not found!")
         
         last_modified_elm = file.find_all('td')[5]['title']
         if last_modified_elm:
