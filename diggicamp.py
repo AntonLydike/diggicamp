@@ -102,17 +102,17 @@ if ARG0 == 'show':
 
         diggicamp.print_folders(dgc, course)
 elif ARG0 == 'fetch':
-    print("fetching new data from server...")
+    print("Fetching new data from server...")
     diggicamp.fetch(dgc, threads=THREADS)
 elif ARG0 == 'pull':
     if 'f' in flags or get_bool_arg('--fetch'):
-        print("fetching new data from server...")
+        print("Fetching new data from server...")
         diggicamp.fetch(dgc, threads=THREADS)
 
-    print("downloading defined folders from server...")
+    print("Downloading defined folders from server...")
     diggicamp.pull(dgc, threads=THREADS)
 elif ARG0 == 'clean':
-    print("cleaning old files and download entries from cache...")
+    print("Cleaning old files and download entries from cache...")
     diggicamp.clean_config(dgc)
 elif ARG0 == 'downloads' or ARG0 == 'dl':
     ARG1 = args.grouped.get('_')[1]
@@ -130,7 +130,7 @@ elif ARG0 == 'downloads' or ARG0 == 'dl':
             folder_name = None
 
         if not course_name or not target:
-            print("correct syntax is: add <course> [<folder>] <path> [--sem <semester>] [--regex <regex>]")
+            print("Correct syntax is: add <course> [<folder>] <path> [--sem <semester>] [--regex <regex>]")
             exit(1)
 
         regex = get_arg('--regex', optional=True)

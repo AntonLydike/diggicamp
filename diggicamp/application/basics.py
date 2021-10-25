@@ -13,7 +13,7 @@ def d_open(path: str = 'dgc.json'):
 
 def new(url: str, path: str = "dgc.json"):
     if os.path.isfile(path):
-        print("dgc is already initialized!")
+        print("Dgc is already initialized!")
         return None
     conf = DiggicampConf.default(url)
     conf.save(path)
@@ -91,7 +91,7 @@ def pull(dgc: Diggicamp, threads: int = 32):
     downloads = dgc.conf.get('downloads')
 
     if threads < 1:
-        raise Exception("downloading cannot happen with fewer than 1 threads!")
+        raise Exception("Downloading cannot happen with fewer than 1 threads!")
 
     exec = ThreadPoolExecutor(max_workers=threads)
 

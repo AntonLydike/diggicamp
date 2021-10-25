@@ -11,7 +11,7 @@ class DiggicampConf:
         self.opts = settings
 
         if 'version' not in settings or settings['version'] != CONFIG_VERSION:
-            print("different version detected")
+            print("Different version detected")
             diggicamp.migrate_config(self)
 
     def get(self, key: str) -> str:
