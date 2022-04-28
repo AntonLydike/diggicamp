@@ -67,11 +67,11 @@ class Diggicamp:
 
         return courses_
 
-    def get_files(self, course_id: str, cached: bool = True):
+    def get_files(self, course_id: str, cached: bool = True) -> dict:
         if cached and self.conf.has('files.' + course_id):
             return self.conf.get('files.' + course_id)
 
-        files = course_files.CourseFiles(self, course_id).getFileTree()
+        files = course_files.CourseFiles(self, course_id).getFileTree() or {}
 
         self.conf.set('files.' + course_id, files)
 

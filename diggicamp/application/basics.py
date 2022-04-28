@@ -1,5 +1,6 @@
 import os
 from concurrent.futures import ThreadPoolExecutor
+from typing import Literal
 
 from ..scraper import Diggicamp
 from ..config import DiggicampConf
@@ -39,16 +40,17 @@ def fetch(dgc: Diggicamp, threads: int = 32):
     print("\nUpdated folders!")
 
 
-def add_download(dgc: Diggicamp, folder_id: str, target: str, regex=None):
+def add_download(dgc: Diggicamp, download_id: str, target: str, regex=None,
+                 download_type: Literal['folder', 'course'] = 'folder'):
     """
     Add an entry to the list of folders/courses we want to download
-        folder_id: the id of the folder we want to download
-        target: the target directory, where we want to download the folder
+        download_id: the id of the folder/course we want to download
+        target: the target directory, where we want to download the folder/course
         regex (opt): a regex pattern which files need to match, in order to be downloaded
     """
 
     entry = {
-        'folder': folder_id,
+        download_type: download_id,
         'target': target
     }
 
@@ -57,30 +59,10 @@ def add_download(dgc: Diggicamp, folder_id: str, target: str, regex=None):
 
     if not dgc.conf.get('downloads'):
         dgc.conf.set('downloads', [entry])
-    else:
+    elif not any(map(lambda download_entry: download_entry[download_type] == download_id, dgc.conf.get('downloads'))):
         dgc.conf.get('downloads').append(entry)
-
-
-def add_download_course(dgc: Diggicamp, course_id: str, target: str, regex=None):
-    """
-    Add an entry to the list of folders/courses we want to download
-        course_id: the id of the course we want to download
-        target: the target directory, where we want to download the folder
-        regex (opt): a regex pattern which files need to match, in order to be downloaded
-    """
-
-    entry = {
-        'course': course_id,
-        'target': target
-    }
-
-    if regex:
-        entry['regex'] = regex
-
-    if not dgc.conf.get('downloads'):
-        dgc.conf.set('downloads', [entry])
     else:
-        dgc.conf.get('downloads').append(entry)
+        print('Download was already added.')
 
 
 def pull(dgc: Diggicamp, threads: int = 32):
@@ -153,5 +135,3 @@ def download_course(dgc: Diggicamp, download_rule: dict, exec: ThreadPoolExecuto
 
 def clean_config(dgc: Diggicamp):
     dgc.conf.cleanup()
-
-
