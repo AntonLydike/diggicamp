@@ -1,4 +1,6 @@
 import json
+from typing import Any
+
 import diggicamp
 
 
@@ -14,7 +16,7 @@ class DiggicampConf:
             print("Different version detected")
             diggicamp.migrate_config(self)
 
-    def get(self, key: str) -> str:
+    def get(self, key: str) -> Any:
         obj = self.opts
         for path in key.split("."):
             if path in obj:

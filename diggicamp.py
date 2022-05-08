@@ -48,7 +48,7 @@ THREADS = int(get_arg('--threads', 32))
 
 # first, check for init
 if ARG0 == 'init':
-    dgc = diggicamp.new(args.grouped.get('_')[1],CFG_FILE)
+    dgc = diggicamp.new(args.grouped.get('_')[1], CFG_FILE)
 
     # error while initializing (config file already exists, etc)
     if not dgc:
@@ -64,7 +64,6 @@ if ARG0 == 'init':
 
     diggicamp.save(dgc, CFG_FILE)
     exit(0)
-
 
 # if we are not in init mode, try to read the config file
 if os.path.isfile(CFG_FILE):
@@ -142,7 +141,7 @@ elif ARG0 == 'downloads' or ARG0 == 'dl':
             exit(1)
 
         if not folder_name:
-            diggicamp.add_download_course(dgc, course['id'], target, regex)
+            diggicamp.add_download(dgc, course['id'], target, regex, 'course')
         else:
             folder = diggicamp.folder_by_name(dgc, folder_name, course)
 
@@ -150,7 +149,7 @@ elif ARG0 == 'downloads' or ARG0 == 'dl':
                 print(f"No folder named \"{folder_name}\" found!")
                 exit(1)
 
-            diggicamp.add_download(dgc, folder['id'], target, regex)
+            diggicamp.add_download(dgc, folder['id'], target, regex, 'folder')
 
         puts(colored.blue("Added download rule:\n", bold=True))
         diggicamp.print_download_definitions(dgc)
