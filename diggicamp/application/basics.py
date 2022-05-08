@@ -59,7 +59,7 @@ def add_download(dgc: Diggicamp, download_id: str, target: str, regex=None,
 
     if not dgc.conf.get('downloads'):
         dgc.conf.set('downloads', [entry])
-    elif not any(map(lambda download_entry: download_entry[download_type] == download_id, dgc.conf.get('downloads'))):
+    elif not any(download_entry[download_type] == download_id for download_entry in dgc.conf.get('downloads')):
         dgc.conf.get('downloads').append(entry)
     else:
         print('Download was already added.')
