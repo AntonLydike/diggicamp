@@ -1,0 +1,9 @@
+{
+  "name": "nextcloud-integration",
+  "version": "1.0.0",
+  "main": "main.js",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}
