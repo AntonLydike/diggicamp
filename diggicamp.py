@@ -1,22 +1,25 @@
 #!/usr/bin/env python3
 
 import os
-import diggicamp
+
 from clint.arguments import Args
-from clint.textui import puts, colored, indent
+from clint.textui import puts, colored
+
+import diggicamp
+from diggicamp import Diggicamp
 
 
 def get_arg(name: str, default=None, optional: bool = False):
     if args.grouped.get(name) and args.grouped.get(name)[0]:
         return args.grouped.get(name)[0]
-    if optional or default != None:
+    if optional or default is not None:
         return default
     print("Expected argument \"{}\" but got nothing!".format(name))
     exit(1)
 
 
 def get_bool_arg(name: str):
-    return args.grouped.get(name) != None
+    return args.grouped.get(name) is not None
 
 
 # Parse args flags
@@ -46,6 +49,9 @@ CFG_FILE = get_arg('--cfg', 'dgc.json')
 # get number of threads
 THREADS = int(get_arg('--threads', 32))
 
+# initialize dgc variable
+dgc: Diggicamp | None = None
+
 # first, check for init
 if ARG0 == 'init':
     dgc = diggicamp.new(args.grouped.get('_')[1], CFG_FILE)
@@ -71,6 +77,10 @@ if os.path.isfile(CFG_FILE):
     dgc.verbose = 'v' in flags
 elif ARG0 and ARG0 != 'help':
     print("Diggicamp is not configured! Run\n\n    dgc init <url> --user <user> --pass <password>\n\nto initialize a new config")
+    exit(1)
+
+if 'dgc' not in globals():
+    print("An unexpected error occurred. Please check for any mistakes and create an issue on github if you cannot resolve the issue.")
     exit(1)
 
 if ARG0 == 'show':
@@ -203,9 +213,9 @@ commands:
                              initialize a new config file. if no password is 
                              specified, you will be prompted, everytime it is
                              required (not very often).
-    fetch [--threads <threadcount>]
+    fetch [--threads <thread count>]
                              refresh semester, courses, folders and files. Use
-                             <threadcount> threads for this (default 32)
+                             <thread count> threads for this (default 32)
     show [--all]             show courses for the current (or all) semesters
     show <semester>          show courses in a specific semester
     show <course>            show files in a specific course from the current
@@ -220,14 +230,14 @@ commands:
 handling downloads: ('downloads' can be shortened to 'dl')
 
     downloads [show]         list all entries in the sync-list
-    downloads add <course> [<folder>] <target> [--sem <semster>] [--regex <regex>]
+    downloads add <course> [<folder>] <target> [--sem <semester>] [--regex <regex>]
                              add a folder (or all folders) of a course to the 
                              sync-list (it will sync with 'dgc pull'). If no 
                              semester is specified, the current semester is 
                              assumed. If a regex is specified, only files 
                              matching it will be downloaded
     downloads remove <id>    remove download with specified id
-    pull [-f|--fetch] [--threads <threadcount>]
+    pull [-f|--fetch] [--threads <thread count>]
                              download all files from the folders on the
                              sync-list to their destinations. If not specified,
                              32 concurrent downloads are started
