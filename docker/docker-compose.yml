@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  download:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - config:/config
+      - /var/lib/docker/volumes/nextcloud_data/_data/Peter/files/Shared/Studium/Digicampus:/downloads
+volumes:
+  config:
