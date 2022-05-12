@@ -123,16 +123,30 @@ elif ARG0 == 'downloads' or ARG0 == 'dl':
         course_name = args.grouped.get('_')[2]
         folder_name = args.grouped.get('_')[3]
         target = args.grouped.get('_')[4]
+        regex = get_arg('--regex', optional=True)
+
+        download_all, download_current = get_bool_arg('--all'), get_bool_arg('--current')
+
+        incorrect_syntax_message = "Correct syntax is:\n\t- add <course> [<folder>] <path> [--sem <semester>] [--regex <regex>]\n\t- add <path> [--all|--current] [--regex <regex>] # semester and course name will be appended to the path."
+
+        if download_all or download_current:
+            if not course_name:
+                print(incorrect_syntax_message)
+                exit(1)
+            target = course_name  # because fewer parameters are required --> course name is actually the target
+            courses = [(course, semester) for semester in dgc.get_courses()[:1 if download_current else None] for course in semester["courses"]]
+            for course, semester in courses:
+                diggicamp.add_download(dgc, course['id'], os.path.join(target, semester['title'], course['name']) if target else semester["title"], regex, 'course')
+            diggicamp.save(dgc, CFG_FILE)
+            exit(0)
+
+        if not target or not course_name:
+            print(incorrect_syntax_message)
+            exit(1)
 
         if not target:
             target = folder_name
             folder_name = None
-
-        if not course_name or not target:
-            print("Correct syntax is: add <course> [<folder>] <path> [--sem <semester>] [--regex <regex>]")
-            exit(1)
-
-        regex = get_arg('--regex', optional=True)
 
         course = diggicamp.course_by_name(dgc, course_name, semester_title=get_arg('--sem', optional=True))
 
@@ -168,7 +182,6 @@ elif ARG0 == 'downloads' or ARG0 == 'dl':
 
         puts(colored.blue("Successfully deleted rule #{}!\n".format(index), bold=True))
         diggicamp.print_download_definitions(dgc)
-
 else:
     print("""Usage: dgc [<flags>] <command> [<args>] [--cfg <path>]
 
