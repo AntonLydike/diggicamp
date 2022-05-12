@@ -76,10 +76,6 @@ def exec_cli(args: Args, flags: set = None):
         print("Diggicamp is not configured! Run\n\n    dgc init <url> --user <user> --pass <password>\n\nto initialize a new config")
         raise CliException(1)  # exit(1)
 
-    if 'dgc' not in globals():
-        print("An unexpected error occurred. Please check for any mistakes and create an issue on github if you cannot resolve the issue.")
-        raise CliException(1)  # exit(1)
-
     if ARG0 == 'show':
         if not args.grouped.get('_')[1]:
             # no arg supplied, list courses with optional all flag

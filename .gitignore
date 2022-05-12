@@ -1,6 +1,7 @@
 __pycache__
 *.pyc
 dgc.json
+downloads
 venv
 node_modules
 .env

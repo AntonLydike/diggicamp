@@ -15,6 +15,18 @@ from dotenv import load_dotenv
 import diggicamp_cli
 from diggicamp import CliException
 
+# load environment variables
+load_dotenv()
+USERNAME = os.getenv('USERNAME')
+PASS = os.getenv('PASS')
+URL = os.getenv('URL')
+CONFIG_LOCATION = os.getenv('CONFIG_LOCATION')
+DOWNLOAD_COURSES = os.getenv('DOWNLOAD_COURSES')
+DOWNLOAD_LOCATION = os.getenv('DOWNLOAD_LOCATION')
+REGEX = os.getenv('REGEX')
+NEXTCLOUD_HOSTNAME = os.getenv('NEXTCLOUD_HOSTNAME')
+NEXTCLOUD_SCAN_FOLDER = os.getenv('NEXTCLOUD_SCAN_FOLDER')
+
 
 def execute_diggicamp_cli(*params: str) -> int:
     """
@@ -23,34 +35,23 @@ def execute_diggicamp_cli(*params: str) -> int:
     @return: the status of the final execution
     """
     try:
-        diggicamp_cli.exec_cli(Args(params))
+        diggicamp_cli.exec_cli(Args([*params, '--cfg', CONFIG_LOCATION]))
         return 0
     except CliException as e:
         return e.status_code
 
 
 def main():
-    # load environment variables
-    load_dotenv()
-    USER = os.getenv('USER')
-    PASS = os.getenv('PASS')
-    CONFIG_LOCATION = os.getenv('CONFIG_LOCATION')
-    DOWNLOAD_COURSES = os.getenv('DOWNLOAD_COURSES')
-    DOWNLOAD_LOCATION = os.getenv('DOWNLOAD_LOCATION')
-    REGEX = os.getenv('REGEX')
-    NEXTCLOUD_HOSTNAME = os.getenv('NEXTCLOUD_HOSTNAME')
-    NEXTCLOUD_SCAN_FOLDER = os.getenv('NEXTCLOUD_SCAN_FOLDER')
-
     # cache argv
     argv = sys.argv
 
     # create config if not exists
-    execute_diggicamp_cli('init', '--cfg', CONFIG_LOCATION)
+    execute_diggicamp_cli('init', URL, '--user', USERNAME, '--pass', PASS)
 
     # update config if exists
 
     # fetch
-    execute_diggicamp_cli('fetch', '--cfg', CONFIG_LOCATION)
+    execute_diggicamp_cli('fetch')
 
     # check if courses must be added (env) --> add courses
     if DOWNLOAD_COURSES.upper() == 'ALL':
@@ -64,7 +65,7 @@ def main():
         print('Please specify "DOWNLOAD_COURSES" in the correct format.')
 
     # pull
-    execute_diggicamp_cli('pull', '--cfg', CONFIG_LOCATION)
+    execute_diggicamp_cli('pull')
 
 
 if __name__ == '__main__':
