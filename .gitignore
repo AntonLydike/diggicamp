@@ -3,6 +3,7 @@ __pycache__
 dgc.json
 venv
 node_modules
+.env
 
 # PyCharm related .gitignore configuration
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
