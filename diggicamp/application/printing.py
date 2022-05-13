@@ -22,7 +22,7 @@ def print_courses(dgc: Diggicamp, all: bool = False, course=None):
 
 
 def print_folders(dgc: Diggicamp, course: dict):
-    folders = dgc.get_files(course['id'])
+    folders = dgc.get_files_folders(course['id'])['folders']
 
     print("{name}".format(**course))
     for folder in folders.values():

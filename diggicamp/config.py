@@ -56,7 +56,7 @@ class DiggicampConf:
         return self.get('version')
 
     def cleanup(self):
-        delkeys = ['files', 'downloads', 'downloaded_versions']
+        delkeys = ['course_download', 'downloads', 'downloaded_versions']
         for key in delkeys:
             if self.has(key):
                 # get path to parent
