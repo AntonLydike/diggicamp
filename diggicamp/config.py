@@ -3,7 +3,6 @@ from typing import Any
 
 import diggicamp
 
-
 CONFIG_VERSION = "1.3.0"
 
 
@@ -27,10 +26,10 @@ class DiggicampConf:
 
     def set(self, key: str, val: any):
         keys = key.split(".")
-        lastKey = keys[len(keys)-1]
+        lastKey = keys[len(keys) - 1]
         obj = self.opts
-        for path in keys[:len(keys)-1]:
-            if not path in obj:
+        for path in keys[:len(keys) - 1]:
+            if path not in obj:
                 obj[path] = {}
             obj = obj[path]
         obj[lastKey] = val
@@ -70,7 +69,6 @@ class DiggicampConf:
                 obj = self.get(parent)
             # remove object from dict
             del obj[key.split('.')[-1]]
-
 
     @staticmethod
     def fromFile(fname: str) -> 'DiggicampConf':
