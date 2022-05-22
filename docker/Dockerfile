@@ -1,14 +1,14 @@
-FROM alpine/git as git
-WORKDIR /app
-RUN git clone https://github.com/TobiasKiehnlein/diggicamp.git .
-
 FROM python:3.9-slim
 WORKDIR /diggicamp
-COPY --from=git /app/requirements.txt ./
+
+COPY requirements.txt ./
 RUN pip3 install -r requirements.txt
-RUN echo 'python /diggicamp/diggicamp.py "$@" --cfg /config/dgc.json' > /usr/bin/dgc && \
+RUN echo 'runuser -u ${FILES_USER} -g ${FILES_GROUP} -- python /diggicamp/diggicamp.py "$@" --cfg /config/dgc.json' > /usr/bin/dgc && \
     chmod +x /usr/bin/dgc
-COPY entry.sh .
-COPY --from=git /app .
-RUN chmod +x entry.sh
-CMD ./entry.sh
+RUN echo 'runuser -u ${FILES_USER} -g ${FILES_GROUP} -- python /diggicamp/docker/timer.py "$@"' > /usr/bin/dgc-timer && \
+    chmod +x /usr/bin/dgc-timer
+COPY . .
+RUN chmod +x ./docker/entry.sh
+RUN mkdir /data
+ENV PYTHONPATH=/diggicamp:$PYTHONPATH
+CMD ./docker/entry.sh
