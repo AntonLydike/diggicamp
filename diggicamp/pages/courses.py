@@ -1,5 +1,7 @@
 import json
 import re
+
+from .helpers import clean_name_for_fs
 from .parsedpage import ParsedPage, unicode
 
 
@@ -18,5 +20,5 @@ class CoursesPage(ParsedPage):
         courses_data = json.loads(courses_json)
 
         return [{'title': group['name'], 'courses': [
-            {'name': course['name'], 'id': course['id']} for course in courses_data['courses'].values() if course['id'] in group['data'][0]['ids']
+            {'name': clean_name_for_fs(course['name']), 'id': course['id']} for course in courses_data['courses'].values() if course['id'] in group['data'][0]['ids']
         ]} for group in courses_data['groups']]

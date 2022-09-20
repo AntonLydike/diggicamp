@@ -1,10 +1,9 @@
 import json
 
-from bs4 import NavigableString
+from .helpers import clean_name_for_fs
 from .parsedpage import ParsedPage, unicode
 from datetime import datetime
 import threading
-import requests
 import re
 import os
 
@@ -55,7 +54,7 @@ def get_folders(dom: str):
     folders_data = json.loads(folders_json.group(1)) if folders_json else []
     return [{
         'id': folder['id'],
-        'name': folder['name'].strip().translate(str.maketrans({"/": "", "<": "", ">": "", ":": "", "\"": "", "\\": "", "?": "", "*": "", "|": ""}))
+        'name': clean_name_for_fs(folder['name'])
     } for folder in folders_data]
 
 
@@ -66,10 +65,11 @@ def process_files(dom: str, output):
     for file in files_data:
         if not file['download_url']:
             return
+        name = clean_name_for_fs(file['name'])
         output.append({
             'id': file['id'],
-            'name': file['name'].strip(),
-            'fname': file['name'].strip(),
+            'name': name,
+            'fname': name,
             'type': 0,
             'last_mod': str(datetime.fromtimestamp(file['chdate'] or datetime.now().timestamp()))
         })
