@@ -6,13 +6,12 @@ on:
     branches:
       - master
 
-env:
-  OWNER: echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]'
-
 jobs:
   build_and_push:
     runs-on: ubuntu-latest
     steps:
+      - name: Setup env
+        run: echo "OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
       - name: Checkout
         uses: actions/checkout@v2
       - name: Set up QEMU
