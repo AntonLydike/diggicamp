@@ -28,7 +28,7 @@ jobs:
           file: docker/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          cache-from: type=registry,ref=ghcr.io/tobiaskiehnlein/diggicamp:latest
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/diggicamp:latest
           cache-to: type=inline
           tags: |
-            ghcr.io/tobiaskiehnlein/diggicamp:latest
+            ghcr.io/${{ github.repository_owner }}/diggicamp:latest
