@@ -1,3 +1,5 @@
+import json
+
 from bs4 import NavigableString
 from .parsedpage import ParsedPage, unicode
 from datetime import datetime
@@ -5,6 +7,7 @@ import threading
 import requests
 import re
 import os
+
 
 class CourseFiles:
     def __init__(self, diggicamp, courseId: str):
@@ -20,7 +23,7 @@ class CourseFiles:
         dom = ParsedPage(self.dgc._get(f'/dispatch.php/course/files?cid={self.id}&cmd=tree')).dom
 
         # handle FOLDERS:
-        # initialize a asynchronous callback collection
+        # initialize an asynchronous callback collection
         # everyone can call add_to_bag to add a return value to the collection
         (get_folder_bag, add_to_folder_bag) = create_bag()
         sub_folders = get_folders(dom)
@@ -45,61 +48,30 @@ class CourseFiles:
 
         return result
 
-#returns all folders ((id, name) tuple) in the specified dom
+
+# returns all folders ((id, name) tuple) in the specified dom
 def get_folders(dom: str):
-    subfolders = dom.find('tbody', class_='subfolders').find_all(id=re.compile(r'row_folder_[A-f0-9]{32}'))
-    output_folders = []
-    for folder in subfolders:
-        id = folder['id'][11:]
-        name = folder.find_all('a')[1].text.strip()
-        #these characters are forbidden in directory names. thx windows...
-        name = name.translate(str.maketrans({"/":  "", "<":  "", ">": "", ":":  "", "\"":  "", "\\":  "", "?":  "", "*":  "", "|":  ""}))
-        output_folders.append({
-            'id': id,
-            'name': name,
-        })
-    return output_folders
+    folders_json = re.search(r"data-folders='([^']*)'", str(dom))
+    folders_data = json.loads(folders_json.group(1)) if folders_json else []
+    return [{
+        'id': folder['id'],
+        'name': folder['name'].strip().translate(str.maketrans({"/": "", "<": "", ">": "", ":": "", "\"": "", "\\": "", "?": "", "*": "", "|": ""}))
+    } for folder in folders_data]
+
 
 def process_files(dom: str, output):
-    fcontainer = dom.find('tbody', class_='files').find_all(id=re.compile(r'fileref_[A-f0-9]{32}'))
+    files_json = re.search(r"data-files='([^']*)'", str(dom))
+    files_data = json.loads(files_json.group(1)) if files_json else []
 
-    if not fcontainer:
-        return
-
-    for file in fcontainer:
-        if isinstance(file, NavigableString):
-            continue
-
-        if file:
-            id = file['id'][8:]
-        else:
-            raise Exception("No id for file found!", file.prettify())
-
-        link = file.find_all('td')[2].find('a')
-
-        if not link:
-            raise Exception("link not found!")
-
-        if not 'href' in link.attrs:
-            # if file is not downloadable, skip it
-            continue
-
-        fname = link.text.strip()
-        if not fname:
-            raise Exception("Filename not found!")
-
-        last_modified_elm = file.find_all('td')[5]['title']
-        if last_modified_elm:
-            last_modified = last_modified_elm.strip()
-        else:
-            last_modified = str(datetime.now())
-
+    for file in files_data:
+        if not file['download_url']:
+            return
         output.append({
-            'id': id,
-            'name': fname,
-            'fname': fname,
+            'id': file['id'],
+            'name': file['name'].strip(),
+            'fname': file['name'].strip(),
             'type': 0,
-            'last_mod': last_modified
+            'last_mod': str(datetime.fromtimestamp(file['chdate'] or datetime.now().timestamp()))
         })
         print('.', end='', flush=True)
 

@@ -1,3 +1,4 @@
+import json
 import re
 from .parsedpage import ParsedPage, unicode
 
@@ -12,26 +13,10 @@ def idFromUrl(url: str):
 
 class CoursesPage(ParsedPage):
     def getCourses(self):
-        # output dictionary
-        semesters = []
-        # find the container of the seminar pages
-        cont = self.dom.find('div', id='my_seminars')
+        # extract the json data from the html
+        courses_json = re.search(r"window.STUDIP.MyCoursesData\s*=\s*([^\n]*})", str(self.dom)).group(1)
+        courses_data = json.loads(courses_json)
 
-        for semester in cont.find_all('table', class_='mycourses'):
-            # remove the thead section, as it contains no valuable information
-            semester.find('thead').extract()
-            sem = {
-                'title': unicode(semester.find('caption').string.strip()),
-                'courses': []
-            }
-
-            for course in semester.find_all('tr'):
-                link = course.find('a')
-                sem['courses'].append({
-                    'name': unicode(link.string.strip()),
-                    'id': idFromUrl(link['href'])
-                })
-
-            semesters.append(sem)
-
-        return semesters
+        return [{'title': group['name'], 'courses': [
+            {'name': course['name'], 'id': course['id']} for course in courses_data['courses'].values() if course['id'] in group['data'][0]['ids']
+        ]} for group in courses_data['groups']]
