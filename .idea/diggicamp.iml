@@ -4,6 +4,9 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/venv" />
       <excludeFolder url="file://$MODULE_DIR$/downloads" />
+      <excludeFolder url="file://$MODULE_DIR$/docker/downloads" />
+      <excludeFolder url="file://$MODULE_DIR$/docker/app" />
+      <excludeFolder url="file://$MODULE_DIR$/docker/app/3rdparty/.github" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

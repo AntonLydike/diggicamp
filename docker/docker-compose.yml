@@ -1,13 +1,10 @@
 version: "3.9"
+
 services:
   download:
     image: test
     env_file:
       - .env
     volumes:
-      - ./config:/data/config
-      - ./downloads:/data/downloads
-      # e.g. nextcloud docker volume (depends on your docker setup):
-      #- /var/lib/docker/volumes/nextcloud_data/_data/<username>/files/<path in user files>:/downloads
-volumes:
-  config:
+      - ./config:/config
+      - ./downloads:/downloads

@@ -8,7 +8,6 @@ RUN echo 'runuser -u ${FILES_USER} -g ${FILES_GROUP} -- python /diggicamp/diggic
 RUN echo 'runuser -u ${FILES_USER} -g ${FILES_GROUP} -- python /diggicamp/docker/timer.py "$@"' > /usr/bin/dgc-timer && \
     chmod +x /usr/bin/dgc-timer
 COPY . .
-RUN chmod +x ./docker/entry.sh
 RUN mkdir /data
 ENV PYTHONPATH=/diggicamp:$PYTHONPATH
-CMD ./docker/entry.sh
+CMD python -u docker/entry.py

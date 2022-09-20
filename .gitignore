@@ -34,3 +34,4 @@ node_modules
 
 # File-based project format
 *.iws
+/docker/app/
