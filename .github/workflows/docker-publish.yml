@@ -5,6 +5,10 @@ on:
     # Publish `master` as Docker `latest` image.
     branches:
       - master
+
+env:
+  OWNER: echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]'
+
 jobs:
   build_and_push:
     runs-on: ubuntu-latest
@@ -28,7 +32,7 @@ jobs:
           file: docker/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/diggicamp:latest
+          cache-from: type=registry,ref=ghcr.io/${{ env.OWNER }}/diggicamp:latest
           cache-to: type=inline
           tags: |
-            ghcr.io/${{ github.repository_owner }}/diggicamp:latest
+            ghcr.io/${{ env.OWNER }}/diggicamp:latest
