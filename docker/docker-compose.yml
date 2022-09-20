@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   download:
-    image: test
+    image: ghcr.io/tobiaskiehnlein/diggicamp:latest  # ghcr.io/antonlydike/diggicamp:latest
     env_file:
       - .env
     volumes:
