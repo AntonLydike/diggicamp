@@ -44,9 +44,30 @@ def migrate_1_1_0(conf: DiggicampConf):
         conf.set('downloaded_versions', {})
 
 
+def migrate_1_2_0(conf: DiggicampConf):
+    print("Migrating to version 1.3.0...")
+    conf.set('version', '1.3.0')
+    files = conf.get('files')
+    if not files:
+        return
+    for cid in files:
+        course = conf.get('files.' + cid)
+        files = []
+        folders = []
+        for fid in course:  # course can have an emtpy list, so .values() cannot be used
+            folder = conf.get('files.' + cid + '.' + fid)
+            folders.append(folder)
+        conf.set('course_download.' + cid, {
+            'root_files': files,
+            'folders': folders
+        })
+    conf.delkey('files')
+
+
 MIGRATIONS = {
     'None': migrate_none,
-    '1.1.0': migrate_1_1_0
+    '1.1.0': migrate_1_1_0,
+    '1.2.0': migrate_1_2_0
 }
 
 

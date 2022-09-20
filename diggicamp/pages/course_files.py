@@ -11,36 +11,39 @@ class CourseFiles:
         self.id = courseId
         self.dgc = diggicamp
 
-    def getFileTree(self):
-        # folder dict
-        folders = {}
+    def getFileTree(self) -> dict:
+        # root files
+        root_files = []
         # list of threads
         threads = []
 
         dom = ParsedPage(self.dgc._get(f'/dispatch.php/course/files?cid={self.id}&cmd=tree')).dom
 
+        # handle FOLDERS:
         # initialize a asynchronous callback collection
         # everyone can call add_to_bag to add a return value to the collection
-        (get_bag, add_to_bag) = create_bag()
+        (get_folder_bag, add_to_folder_bag) = create_bag()
         sub_folders = get_folders(dom)
-        if not sub_folders:
-            return
-        for folder in sub_folders:
-            # start a thread to download folder contents            
-            thread = threading.Thread(target=process_folder_async, args=(self.dgc, self.id, folder['id'], folder['name'], add_to_bag))
-            thread.start()
-            threads.append(thread)
+        if sub_folders is not None:
+            for folder in sub_folders:
+                # start a thread to download folder contents
+                thread = threading.Thread(target=process_folder_async, args=(self.dgc, self.id, folder['id'], folder['name'], add_to_folder_bag))
+                thread.start()
+                threads.append(thread)
+
+        # handle FILES in root directory
+        process_files(dom, root_files)
 
         # wait for all threads to finish
         for thread in threads:
             thread.join()
 
-        count = 0
-        for folder in get_bag():
-            folders[folder['id']] = folder
-            count += 1
+        result = {
+            'root_files': root_files,
+            'folders': get_folder_bag()
+        }
 
-        return folders
+        return result
 
 #returns all folders ((id, name) tuple) in the specified dom
 def get_folders(dom: str):
@@ -57,26 +60,7 @@ def get_folders(dom: str):
         })
     return output_folders
 
-
-def process_folder_async(diggicamp, course: str, id: str, name: str, add_folder):
-    # print a little progress indicator
-    print('.', end='', flush=True)
-
-    html = diggicamp._post(f'/dispatch.php/course/files/index/{id}?cid={course}', data=f'getfolderbody={id}')
-    dom = ParsedPage(html).dom
-
-    folder = {
-        'id': id,
-        'name': name,
-        'files': []
-    }
-
-    # query subfolders
-    subfolders = get_folders(dom)
-    if subfolders:
-        for subfolder in subfolders:
-            process_folder_async(diggicamp, course, subfolder['id'], os.path.join(name, subfolder['name']), add_folder)
-
+def process_files(dom: str, output):
     fcontainer = dom.find('tbody', class_='files').find_all(id=re.compile(r'fileref_[A-f0-9]{32}'))
 
     if not fcontainer:
@@ -99,18 +83,18 @@ def process_folder_async(diggicamp, course: str, id: str, name: str, add_folder)
         if not 'href' in link.attrs:
             # if file is not downloadable, skip it
             continue
-        
+
         fname = link.text.strip()
         if not fname:
             raise Exception("Filename not found!")
-        
+
         last_modified_elm = file.find_all('td')[5]['title']
         if last_modified_elm:
             last_modified = last_modified_elm.strip()
         else:
             last_modified = str(datetime.now())
 
-        folder['files'].append({
+        output.append({
             'id': id,
             'name': fname,
             'fname': fname,
@@ -118,6 +102,28 @@ def process_folder_async(diggicamp, course: str, id: str, name: str, add_folder)
             'last_mod': last_modified
         })
         print('.', end='', flush=True)
+
+
+def process_folder_async(diggicamp, course: str, id: str, name: str, add_folder):
+    # print a little progress indicator
+    print('.', end='', flush=True)
+
+    html = diggicamp._post(f'/dispatch.php/course/files/index/{id}?cid={course}', data=f'getfolderbody={id}')
+    dom = ParsedPage(html).dom
+
+    folder = {
+        'id': id,
+        'name': name,
+        'files': []
+    }
+
+    # query subfolders
+    subfolders = get_folders(dom)
+    if subfolders:
+        for subfolder in subfolders:
+            process_folder_async(diggicamp, course, subfolder['id'], os.path.join(name, subfolder['name']), add_folder)
+
+    process_files(dom, folder['files'])
 
     add_folder(folder)
 

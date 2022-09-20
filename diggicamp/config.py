@@ -4,7 +4,7 @@ import os
 
 import diggicamp
 
-CONFIG_VERSION = "1.2.0"
+CONFIG_VERSION = "1.3.0"
 
 
 class DiggicampConf:
@@ -62,17 +62,20 @@ class DiggicampConf:
         return self.get('version')
 
     def cleanup(self):
-        delkeys = ['files', 'downloads', 'downloaded_versions']
+        delkeys = ['course_download', 'downloads', 'downloaded_versions']
         for key in delkeys:
-            if self.has(key):
-                # get path to parent
-                parent = '.'.join(key.split('.')[0:-1])
-                if not parent:
-                    obj = self.opts
-                else:
-                    obj = self.get(parent)
-                # remove object from dict
-                del obj[key.split('.')[-1]]
+            self.delkey(key)
+
+    def delkey(self, key):
+        if self.has(key):
+            # get path to parent
+            parent = '.'.join(key.split('.')[0:-1])
+            if not parent:
+                obj = self.opts
+            else:
+                obj = self.get(parent)
+            # remove object from dict
+            del obj[key.split('.')[-1]]
 
     @staticmethod
     def fromFile(fname: str) -> 'DiggicampConf':
