@@ -32,7 +32,7 @@ def fetch(dgc: Diggicamp, threads: int = 32):
         return
 
     exec = ThreadPoolExecutor(max_workers=threads)
-    # refresha all downloaded courses
+    # refresh all downloaded courses
     for course in dgc.conf.get('course_download'):
         exec.submit(dgc.get_files_folders, course, cached=False)
 

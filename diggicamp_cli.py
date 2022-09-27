@@ -137,7 +137,12 @@ def exec_cli(args: Args, flags: set = None):
                     print(incorrect_syntax_message)
                     raise CliException(1)  # exit(1)
                 target = course_name  # because fewer parameters are required --> course name is actually the target
-                courses = [(course, semester) for semester in dgc.get_courses()[:1 if download_current else None] for course in semester["courses"]]
+
+                if download_all:
+                    courses = [(course, semester) for semester in dgc.get_courses() for course in semester["courses"]]
+                else:
+                    courses = [(course, semester) for semester in dgc.get_courses()[:(1 if download_current else None)] for course in semester["courses"]]
+
                 for course, semester in courses:
                     diggicamp.add_download(dgc, course['id'], os.path.join(target, semester['title'], course['name']) if target else semester["title"], regex, 'course')
                 diggicamp.save(dgc, CFG_FILE)

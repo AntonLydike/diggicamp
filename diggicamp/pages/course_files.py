@@ -64,7 +64,7 @@ def process_files(dom: str, output):
 
     for file in files_data:
         if not file['download_url']:
-            return
+            continue
         name = clean_name_for_fs(file['name'])
         output.append({
             'id': file['id'],
