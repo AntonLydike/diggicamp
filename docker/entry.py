@@ -6,6 +6,7 @@ from docker.user_group_handling import UnixUser
 
 FILES_UID = int(os.getenv('FILES_UID', os.getenv('UID', '0')))
 FILES_GID = int(os.getenv('FILES_GID', os.getenv('GID', '0')))
+POST_PULL_COMMAND = os.getenv('POST_PULL_COMMAND')
 
 application_user = UnixUser(FILES_UID, FILES_GID)
 
@@ -25,3 +26,7 @@ for folder_name in ['/downloads', '/config']:
 while True:
     application_user.exec(timer.main)
     time.sleep(float(os.getenv('POLLING_INTERVAL', '900')))
+
+    # run post pull command
+    if POST_PULL_COMMAND:
+        os.system(POST_PULL_COMMAND)

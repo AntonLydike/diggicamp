@@ -7,9 +7,7 @@ If enabled a local nextcloud instance will be notified to update local file chan
 """
 import os
 import sys
-
 from clint import Args
-
 from dotenv import load_dotenv
 
 import diggicamp_cli
@@ -24,8 +22,6 @@ CONFIG_LOCATION = os.getenv('CONFIG_LOCATION', '/config/dgc.json')
 DOWNLOAD_COURSES = os.getenv('DOWNLOAD_COURSES')
 DOWNLOAD_LOCATION = os.getenv('DOWNLOAD_LOCATION', '/downloads')
 REGEX = os.getenv('REGEX')
-NEXTCLOUD_HOSTNAME = os.getenv('NEXTCLOUD_HOSTNAME')
-NEXTCLOUD_SCAN_FOLDER = os.getenv('NEXTCLOUD_SCAN_FOLDER')
 
 
 def execute_diggicamp_cli(*params: str) -> int:
