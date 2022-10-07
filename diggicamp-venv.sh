@@ -10,5 +10,5 @@ if [ ! -d $DGC_PATH/venv ] || [ $1 == 'install' ] ; then
     echo -e "  you can now use diggicamp!\n######\n\n"
 fi
 
-$DGC_PATH/venv/bin/python3 $DGC_PATH/diggicamp.py "$@"
+$DGC_PATH/venv/bin/python3 $DGC_PATH/diggicamp_cli.py "$@"
 

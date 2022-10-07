@@ -130,7 +130,8 @@ def exec_cli(args: Args, flags: set = None):
 
             download_all, download_current = get_bool_arg('--all'), get_bool_arg('--current')
 
-            incorrect_syntax_message = "Correct syntax is:\n\t- add <course> [<folder>] <path> [--sem <semester>] [--regex <regex>]\n\t- add <path> [--all|--current] [--regex <regex>] # semester and course name will be appended to the path."
+            # TODO: just display usage
+            incorrect_syntax_message = "Correct syntax is:\n\t- add <course> [<folder>] <target> [--sem <semester>] [--regex <regex>]\n\t- add <target> [--all|--current] [--regex <regex>] # semester and course name will be appended to the path."
 
             if download_all or download_current:
                 if not course_name:
@@ -191,6 +192,7 @@ def exec_cli(args: Args, flags: set = None):
             puts(colored.blue("Successfully deleted rule #{}!\n".format(index), bold=True))
             diggicamp.print_download_definitions(dgc)
     else:
+        # TODO: Update usage
         print("""Usage: dgc [<flags>] <command> [<args>] [--cfg <path>]
     
     Download files for courses from digicampus.
