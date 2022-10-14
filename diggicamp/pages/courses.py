@@ -19,6 +19,6 @@ class CoursesPage(ParsedPage):
         courses_json = re.search(r"window.STUDIP.MyCoursesData\s*=\s*([^\n]*})", str(self.dom)).group(1)
         courses_data = json.loads(courses_json)
 
-        return [{'title': group['name'], 'courses': [
+        return [{'title': clean_name_for_fs(group['name']), 'courses': [
             {'name': clean_name_for_fs(course['name']), 'id': course['id']} for course in courses_data['courses'].values() if course['id'] in group['data'][0]['ids']
         ]} for group in courses_data['groups']]
