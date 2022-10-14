@@ -25,8 +25,9 @@ for folder_name in ['/downloads', '/config']:
 
 while True:
     application_user.exec(timer.main)
-    time.sleep(float(os.getenv('POLLING_INTERVAL', '900')))
 
     # run post pull command
     if POST_PULL_COMMAND:
         os.system(POST_PULL_COMMAND)
+
+    time.sleep(float(os.getenv('POLLING_INTERVAL', '900')))

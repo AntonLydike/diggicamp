@@ -2,8 +2,6 @@
 This file is intended to be called in a timer.
 
 Depending on configuration it will add new courses to the configuration automatically and download all corresponding files.
-
-If enabled a local nextcloud instance will be notified to update local file changes.
 """
 import os
 import sys
@@ -54,11 +52,12 @@ def main():
         execute_diggicamp_cli('downloads', 'add', DOWNLOAD_LOCATION, '--all')
     elif DOWNLOAD_COURSES.upper() == 'CURRENT':
         execute_diggicamp_cli('downloads', 'add', DOWNLOAD_LOCATION, '--current')
-    elif True:
+    elif False:
         # TODO check if download courses is a list of courses and add those manually
         pass
     else:
         print('Please specify "DOWNLOAD_COURSES" in the correct format.')
+        exit(1)
 
     # pull
     execute_diggicamp_cli('pull')
