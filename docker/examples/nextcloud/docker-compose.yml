@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  download:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - config:/config
+      - /opt/digicampus-downloads:/downloads
+    # If the nextcloud runs as a docker container behind a reverse proxy, add this container to the network of the proxy
+    # and map the public domain of the nextcloud to the ip of the proxy.
+    #networks:
+    #  proxy:
+    #extra_hosts:
+    #  - '<domain of your nextcloud>:<local ip of the reverse proxy>'
+
+volumes:
+  config:
+
+#networks:
+#  proxy:
+#    external: true
+#    name: <proxy-network>
+
