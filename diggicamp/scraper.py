@@ -1,11 +1,11 @@
 import os
-import urllib
 import requests
+import urllib
 from getpass import getpass
 
+from .config import DiggicampConf
 from .exceptions import WebException, NotLoggedInScepion
 from .pages import login, courses, course_files
-from .config import DiggicampConf
 
 
 class Diggicamp:
@@ -92,9 +92,9 @@ class Diggicamp:
         if not unauthed and not self.authed:
             self.login()
 
-        if base == None:
+        if base is None:
             base = self.conf.get('baseurl')
-        
+
         resp = self.session.get(base + url)
 
         if resp.ok:
@@ -105,7 +105,7 @@ class Diggicamp:
                 return self._get(url, base)
             return resp.text
         else:
-            raise WebException("Response is not valid!", base + url, resp)
+            print(f'Invalid Response in {base + url}')
 
     def _post(self, url: str, data, base=None, unauthed: bool = False):
         if not unauthed and not self.authed:
@@ -145,7 +145,7 @@ class Diggicamp:
                 for chunk in resp.iter_content(chunk_size=8192):
                     f.write(chunk)
                     len_written += len(chunk)
-            
+
             if len_written == 0:
                 os.remove(target)
                 return False
