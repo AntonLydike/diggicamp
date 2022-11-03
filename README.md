@@ -11,15 +11,15 @@ If you don't want to install anything, just use `diggicamp-venv.sh` that automat
 
 ### Other
 
-If you feel the need to polute your global python package space, you can install dependencies manually by running `pip install -r requirements.txt`. You should probably not do this.
+If you feel the need to pollute your global python package space, you can install dependencies manually by running `pip install -r requirements.txt`. You should probably not do this.
 
 ## Usage
 
 This... thing... exposes a couple of ways to interact with it:
 
-
 ### CLI
-to use the cli, link the `diggicamp.py` script anywhere to your path (alias is `dgc` or something like that) and then use it like this:
+
+to use the cli, link the `diggicamp_cli.py` script anywhere to your path (alias is `dgc` or something like that) and then use it like this:
 
 ```
 Usage: dgc [<flags>] <command> [<args>] [--cfg <path>]
@@ -58,18 +58,33 @@ commands:
 handling downloads: ('downloads' can be shortened to 'dl')
 
     downloads [show]         list all entries in the sync-list
+    
     downloads add <course> [<folder>] <target> [--sem <semster>] [--regex <regex>]
                              add a folder (or all folders) of a course to the 
                              sync-list (it will sync with 'dgc pull'). If no 
                              semester is specified, the current semester is 
                              assumed. If a regex is specified, only files 
                              matching it will be downloaded
+    downloads add <target> [--all|--current] [--regex <regex>]
+                            --all: add all courses of all semesters to the sync-list
+                            --current: add all courses of the current semester to the sync-list
+                            If a regex is specified, only files 
+                            matching it will be downloaded
+                             
     downloads remove <id>    remove download with specified id
     pull [-f|--fetch] [--threads <threadcount>]
                              download all files from the folders on the
                              sync-list to their destinations. If not specified,
                              32 concurrent downloads are started
 ```
+
+### Docker-compose
+
+* Regularly built
+* env
+* env settings
+* docker-compose
+* docker-compose up -d
 
 ### Python package
 
@@ -116,10 +131,11 @@ course_by_id(dgc, 'a0808df98009adfe98af')
 print_courses(dgc, all=True)
 
 # print folders in a course
-print_curses(dgc, course)
+print_courses(dgc, course)
 ```
 
 # structure of the config file
+
 The config file is json. It has the following entries:
 * `version`: a version string representing the version of diggicamp
 * `baseurl`: the base url of the digicampus website
@@ -127,21 +143,27 @@ The config file is json. It has the following entries:
   * `mode`: the credential mode used. Available modes:
     * `plain`: The credentials are stored in plaintext in the fields `username` and `password`
     * `prompt`: Ask the user for his password every time login is required (this does not happen often, as the session is saved between executions)
-* `courses`: an array of the courses. Sorted in descending order, so the first element is the current semester
-* `files`: file list, structured like this: 
-  * `files.course_id.folder_id`:
-    * `id`: folder id 
-    * `name`: file name
-    * `files`: files contained in this folder, each file has the following fields:
-      * `id`: file id
-      * `name`: file name (displayed, no file ending)
-      * `fname`: file name (real, with file ending)
-* `downloads`: A list of downlaod rules with these fields:
-  * `folder`: id of the folder
+* `courses`: An array of semesters. Sorted in descending order, so the first element is the current semester
+  * `title`: Semester title
+  * `courses`: An array of the courses of the semester
+* `downloads`: An array of download rules with these fields:
+  * `course`: id of the course
   * `target`: path where to download
   * `regex`: (optional) a regex files not matching will be ignored
+* `course_download`: The file and folder information scraped from digicampus. A dictionary with course ids as keys. Value has the following fields:
+  * `root_files`: Array of files in the root folder of the course
+  * `folders`: Array of subfolders. Each entry has the following fields
+    * `id`: Folder id
+    * `name`: Folder name (includes full path from the course root)
+    * `files`: An array of files of this folder
+  * Each file entry has the following fields:
+    * `id`: file id
+    * `name`: file name (displayed, no file ending)
+    * `fname`: file name (real, with file ending)
+    * `type`: ?
+    * `last_mod`: When the file was last modified on digicampus (is usually the upload time)
 * `cookies`: session cookies, used internally
-* `downloaded_version`: The versions of the downloaded files to prevent double downloads
+* `downloaded_versions`: The versions of the downloaded files to prevent double downloads. A dictionary with file id as key and download time as value
 
 # TO-DO:
 

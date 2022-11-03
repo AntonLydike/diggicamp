@@ -1,11 +1,11 @@
 import os
-import urllib
 import requests
+import urllib
 from getpass import getpass
 
+from .config import DiggicampConf
 from .exceptions import WebException, NotLoggedInScepion
 from .pages import login, courses, course_files
-from .config import DiggicampConf
 
 
 class Diggicamp:
@@ -67,22 +67,24 @@ class Diggicamp:
 
         return courses_
 
-    def get_files(self, course_id: str, cached: bool = True) -> dict:
-        if cached and self.conf.has('files.' + course_id):
-            return self.conf.get('files.' + course_id)
+    def get_files_folders(self, course_id: str, cached: bool = True) -> dict:
+        if cached and self.conf.has('course_download.' + course_id):
+            return self.conf.get('course_download.' + course_id)
 
-        files = course_files.CourseFiles(self, course_id).getFileTree() or {}
+        files_folders = course_files.CourseFiles(self, course_id).getFileTree() or {}
 
-        self.conf.set('files.' + course_id, files)
+        self.conf.set('course_download.' + course_id, files_folders)
 
-        return files
+        return files_folders
 
     def get_cached_folder(self, fid: str):
-        folders = self.conf.get('files')
+        files_folders = self.conf.get('course_download')
 
-        for course in folders.values():
-            if course is not None and fid in course:
-                return course[fid]
+        for course in files_folders.values():
+            if course is not None:
+                for folder in course['folders']:
+                    if folder['id'] == fid:
+                        return folder
 
         return None
 
@@ -90,9 +92,9 @@ class Diggicamp:
         if not unauthed and not self.authed:
             self.login()
 
-        if base == None:
+        if base is None:
             base = self.conf.get('baseurl')
-        
+
         resp = self.session.get(base + url)
 
         if resp.ok:
@@ -143,7 +145,7 @@ class Diggicamp:
                 for chunk in resp.iter_content(chunk_size=8192):
                     f.write(chunk)
                     len_written += len(chunk)
-            
+
             if len_written == 0:
                 os.remove(target)
                 return False

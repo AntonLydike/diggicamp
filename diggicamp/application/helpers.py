@@ -46,7 +46,7 @@ def folder_by_name(dgc: Diggicamp, folder_name: str, course):
     else:
         cid = course
 
-    folders = dgc.get_files(cid)
+    folders = dgc.get_files_folders(cid)['folders']
 
     for folder in folders.values():
         if folder['name'] == folder_name:

@@ -28,13 +28,13 @@ def save(dgc: Diggicamp, path: str = 'dgc.json'):
 def fetch(dgc: Diggicamp, threads: int = 32):
     dgc.get_courses(cached=False)
 
-    if not dgc.conf.get('files'):
+    if not dgc.conf.get('course_download'):
         return
 
     exec = ThreadPoolExecutor(max_workers=threads)
-    # refresha all downloaded courses
-    for course in dgc.conf.get('files'):
-        exec.submit(dgc.get_files, course, cached=False)
+    # refresh all downloaded courses
+    for course in dgc.conf.get('course_download'):
+        exec.submit(dgc.get_files_folders, course, cached=False)
 
     exec.shutdown()
     print("\nUpdated folders!")
@@ -113,6 +113,16 @@ with the correct course to initially fetch the folder""")
     for file in folder['files']:
         exec.submit(dgc._download_file, target, file)
 
+def download_file(dgc: Diggicamp, download_rule: dict, exec: ThreadPoolExecutor):
+    """
+    Download a file
+    """
+    target = download_rule['target']
+    file = download_rule['file']
+    if not os.path.exists(target):
+        os.makedirs(target)
+    exec.submit(dgc._download_file, target, file)
+
 
 def download_course(dgc: Diggicamp, download_rule: dict, exec: ThreadPoolExecutor):
     """
@@ -120,17 +130,27 @@ def download_course(dgc: Diggicamp, download_rule: dict, exec: ThreadPoolExecuto
     all folders in this course
     """
 
-    folders = dgc.conf.get('files.' + download_rule['course'])
+    files_folders = dgc.conf.get('course_download.' + download_rule['course'])
 
-    if not folders:
+    if not files_folders:
         course = course_by_id(dgc, download_rule['course'])
-        folders = dgc.get_files(course['id'])
+        if not course:
+            return
+        files_folders = dgc.get_files_folders(course['id'])
 
-    for fid in folders:
+    for folder in files_folders['folders']:
         rule = download_rule.copy()
-        rule['folder'] = fid
-        rule['target'] += '/' + folders[fid]['name']
+        rule['folder'] = folder['id']
+        rule['target'] += '/' + folder['name']
         download_folder(dgc, rule, exec)
+
+    for file in files_folders['root_files']:
+        rule = {
+            'target': download_rule['target'],
+            'file': file
+        }
+        download_file(dgc, rule, exec)
+
 
 
 def clean_config(dgc: Diggicamp):

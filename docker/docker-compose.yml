@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  download:
+    image: ghcr.io/tobiaskiehnlein/diggicamp:latest  # ghcr.io/antonlydike/diggicamp:latest
+    env_file:
+      - .env
+    volumes:
+      - ./config:/config
+      - ./downloads:/downloads

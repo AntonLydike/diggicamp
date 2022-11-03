@@ -21,6 +21,5 @@ class LoginPage(ParsedPage):
         return self.dom.find("form", attrs={'name': 'login'}).attrs.get('action')
 
     def getRedirectUrlFromResponse(self, resp: str):
-        dom = BeautifulSoup(resp,  "html.parser")
-        return dom.find('p', attrs={'class': 'info message'}).find(
-            'a').attrs.get('href')
+        dom = BeautifulSoup(resp, "html.parser")
+        return dom.find('p', attrs={'class': 'info message'}).find('a').attrs.get('href')

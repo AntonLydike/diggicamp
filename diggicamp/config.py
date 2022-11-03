@@ -1,10 +1,10 @@
 import json
 from typing import Any
+import os
 
 import diggicamp
 
-
-CONFIG_VERSION = "1.2.0"
+CONFIG_VERSION = "1.3.0"
 
 
 class DiggicampConf:
@@ -27,15 +27,21 @@ class DiggicampConf:
 
     def set(self, key: str, val: any):
         keys = key.split(".")
-        lastKey = keys[len(keys)-1]
+        lastKey = keys[len(keys) - 1]
         obj = self.opts
-        for path in keys[:len(keys)-1]:
-            if not path in obj:
+        for path in keys[:len(keys) - 1]:
+            if path not in obj:
                 obj[path] = {}
             obj = obj[path]
         obj[lastKey] = val
 
     def save(self, file: str):
+        # create containing folder if not exists
+        folder_path = os.path.dirname(os.path.abspath(file))
+        print(folder_path)
+        os.makedirs(folder_path, exist_ok=True)
+
+        # dump config to file
         with open(file, "w") as f:
             f.write(json.dumps(self.opts, indent=2, default=lambda o: '<not serializable>'))
 
@@ -56,18 +62,20 @@ class DiggicampConf:
         return self.get('version')
 
     def cleanup(self):
-        delkeys = ['files', 'downloads', 'downloaded_versions']
+        delkeys = ['course_download', 'downloads', 'downloaded_versions']
         for key in delkeys:
-            if self.has(key):
-                # get path to parent
-                parent = '.'.join(key.split('.')[0:-1])
-                if not parent:
-                    obj = self.opts
-                else:
-                    obj = self.get(parent)
-                # remove object from dict
-                del obj[key.split('.')[-1]]
+            self.delkey(key)
 
+    def delkey(self, key):
+        if self.has(key):
+            # get path to parent
+            parent = '.'.join(key.split('.')[0:-1])
+            if not parent:
+                obj = self.opts
+            else:
+                obj = self.get(parent)
+            # remove object from dict
+            del obj[key.split('.')[-1]]
 
     @staticmethod
     def fromFile(fname: str) -> 'DiggicampConf':
