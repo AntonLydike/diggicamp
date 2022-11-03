@@ -1,11 +1,11 @@
 import json
+import os
+import re
+import threading
+from datetime import datetime
 
 from .helpers import clean_name_for_fs
 from .parsedpage import ParsedPage, unicode
-from datetime import datetime
-import threading
-import re
-import os
 
 
 class CourseFiles:
@@ -19,7 +19,10 @@ class CourseFiles:
         # list of threads
         threads = []
 
-        dom = ParsedPage(self.dgc._get(f'/dispatch.php/course/files?cid={self.id}&cmd=tree')).dom
+        html = self.dgc._get(f'/dispatch.php/course/files?cid={self.id}&cmd=tree')
+        if not html:
+            return {}
+        dom = ParsedPage(html).dom
 
         # handle FOLDERS:
         # initialize an asynchronous callback collection
