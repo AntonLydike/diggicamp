@@ -105,8 +105,7 @@ class Diggicamp:
                 return self._get(url, base)
             return resp.text
         else:
-            print(f'Invalid Response in {base + url}')
-            return ''
+            raise WebException("Response is not valid!", base + url, resp)
 
     def _post(self, url: str, data, base=None, unauthed: bool = False):
         if not unauthed and not self.authed:

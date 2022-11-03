@@ -134,6 +134,8 @@ def download_course(dgc: Diggicamp, download_rule: dict, exec: ThreadPoolExecuto
 
     if not files_folders:
         course = course_by_id(dgc, download_rule['course'])
+        if not course:
+            return
         files_folders = dgc.get_files_folders(course['id'])
 
     for folder in files_folders['folders']:

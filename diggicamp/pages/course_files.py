@@ -5,7 +5,7 @@ import threading
 from datetime import datetime
 
 from .helpers import clean_name_for_fs
-from .parsedpage import ParsedPage, unicode
+from .parsedpage import ParsedPage
 
 
 class CourseFiles:
@@ -19,9 +19,11 @@ class CourseFiles:
         # list of threads
         threads = []
 
-        html = self.dgc._get(f'/dispatch.php/course/files?cid={self.id}&cmd=tree')
-        if not html:
+        try:
+            html = self.dgc._get(f'/dispatch.php/course/files?cid={self.id}&cmd=tree')
+        except:
             return {}
+
         dom = ParsedPage(html).dom
 
         # handle FOLDERS:
